@@ -33,7 +33,6 @@ def create_regression_model(
     Returns:
         tuple: The RegressionExperiment and the trained Pipeline containing the model.
     """
-
     exp = RegressionExperiment()
     exp.setup(data=train_data, target=target, experiment_name=exp_name)
 
