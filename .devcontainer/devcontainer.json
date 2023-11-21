@@ -28,7 +28,33 @@
         "isort.importStrategy": "fromEnvironment",
         "flake8.importStrategy": "fromEnvironment",
         "pylint.importStrategy": "fromEnvironment",
-        "terminal.integrated.defaultProfile.linux": "zsh"
+        "terminal.integrated.defaultProfile.linux": "zsh",
+
+        "[javascript]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[json]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[jsonc]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[python]": {
+          "editor.codeActionsOnSave": {
+            "source.organizeImports": true
+          },
+          "editor.defaultFormatter": "ms-python.black-formatter",
+          "editor.formatOnSave": true,
+          "editor.rulers": [88]
+        },
+        "editor.formatOnSave": true,
+        "git.branchProtection": ["main"],
+        "jupyter.notebookFileRoot": "${workspaceFolder}",
+        "notebook.diff.ignoreMetadata": true,
+        "notebook.diff.ignoreOutputs": true,
+        "notebook.formatOnSave.enabled": true,
+        "python.testing.pytestEnabled": true,
+        "python.testing.unittestEnabled": false
       },
       "extensions": [
         "bierner.markdown-mermaid",
