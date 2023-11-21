@@ -9,6 +9,8 @@ packages = [{include = "fhdw"}]
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.12"
+
+kaleido = "0.2.1"
 pycaret = ">=3.2.0"
 
 
