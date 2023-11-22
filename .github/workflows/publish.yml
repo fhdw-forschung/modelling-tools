@@ -43,7 +43,7 @@ jobs:
         run: poetry publish -r test-pypi -u __token__ -p ${{ secrets.TEST_PYPI_API_TOKEN }}
 
       - name: Installation Test
-        run: pip install fhdw-modelling
+        run: pip install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple fhdw-modelling
 
   deploy:
     runs-on: ubuntu-latest
@@ -68,3 +68,6 @@ jobs:
 
       - name: Publish package
         run: poetry publish -u __token__ -p ${{ secrets.PYPI_API_TOKEN }}
+
+      - name: Installation Test
+        run: pip install fhdw-modelling

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fhdw-modelling"
-version = "0.2.1"
+version = "0.2.2"
 description = "A collection of modelling tools. Intended for generic usage in FHDW projects."
 authors = ["Pascal Niggemeier <pascal.niggemeier@fhdw.de>"]
 license = "MPL-2.0"
