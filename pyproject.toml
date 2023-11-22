@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fhdw-modelling"
-version = "0.1.0"
+version = "0.2.0"
 description = "A collection of modelling tools. Intended for generic usage in FHDW projects."
 authors = ["Pascal Niggemeier <pascal.niggemeier@fhdw.de>"]
 license = "MPL-2.0"
@@ -12,6 +12,7 @@ python = ">=3.11,<3.12"
 
 kaleido = "0.2.1"
 pycaret = ">=3.2.0"
+
 
 [tool.poetry.group.dev.dependencies]
 bandit = "^1.7.5"
