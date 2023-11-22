@@ -20,6 +20,9 @@
   // Use 'postCreateCommand' to run commands after the container is created.
   "postCreateCommand": "zsh ./.devcontainer/postcreate.sh",
 
+  // add GPU support to the container in case the host supports it
+  "hostRequirements": { "gpu": "optional" },
+
   // Configure tool-specific properties.
   "customizations": {
     "vscode": {

@@ -1,0 +1,53 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Lint with flake8",
+      "type": "shell",
+      "command": ".venv/bin/python -m flake8 $(git ls-files '*.py') --statistics --count",
+      "group": "test"
+    },
+    {
+      "label": "Lint with isort",
+      "type": "shell",
+      "group": "test",
+      "command": ".venv/bin/python -m isort $(git ls-files '*.py') --profile black --sl -c --diff"
+    },
+    {
+      "label": "Lint with pydocstyle",
+      "type": "shell",
+      "command": ".venv/bin/python -m pydocstyle $(git ls-files '*.py') --count",
+      "group": "test"
+    },
+    {
+      "label": "Security Check with bandit",
+      "type": "shell",
+      "command": ".venv/bin/python -m bandit $(git ls-files '*.py') -r -iii -ll",
+      "group": "test"
+    },
+    {
+      "label": "Lint with black",
+      "type": "shell",
+      "command": ".venv/bin/python -m black $(git ls-files '*.py') --check",
+      "group": "test"
+    },
+    {
+      "label": "All Lint Tasks",
+      "type": "shell",
+      "dependsOn": [
+        "Lint with black",
+        "Lint with flake8",
+        "Lint with isort",
+        "Lint with pydocstyle",
+        "Security Check with bandit"
+      ],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    }
+  ]
+}

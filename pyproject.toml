@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fhdw-modelling"
-version = "0.1.0"
+version = "0.2.0"
 description = "A collection of modelling tools. Intended for generic usage in FHDW projects."
 authors = ["Pascal Niggemeier <pascal.niggemeier@fhdw.de>"]
 license = "MPL-2.0"
@@ -9,8 +9,18 @@ packages = [{include = "fhdw"}]
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.12"
+
+kaleido = "0.2.1"
 pycaret = ">=3.2.0"
 
+
+[tool.poetry.group.dev.dependencies]
+bandit = "^1.7.5"
+black = "^23.11.0"
+flake8 = "^6.1.0"
+isort = "^5.12.0"
+pydocstyle = "^6.3.0"
+pytest = "^7.4.3"
 
 [build-system]
 requires = ["poetry-core"]
