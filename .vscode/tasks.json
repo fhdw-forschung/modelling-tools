@@ -6,31 +6,31 @@
     {
       "label": "Lint with flake8",
       "type": "shell",
-      "command": ".venv/bin/python -m flake8 $(git ls-files '*.py') --statistics --count",
+      "command": "poetry run python -m flake8 $(git ls-files '*.py') --statistics --count",
       "group": "test"
     },
     {
       "label": "Lint with isort",
       "type": "shell",
-      "group": "test",
-      "command": ".venv/bin/python -m isort $(git ls-files '*.py') --profile black --sl -c --diff"
+      "command": "poetry run python -m isort $(git ls-files '*.py') --profile black --sl -c --diff",
+      "group": "test"
     },
     {
       "label": "Lint with pydocstyle",
       "type": "shell",
-      "command": ".venv/bin/python -m pydocstyle $(git ls-files '*.py') --count",
+      "command": "poetry run python -m pydocstyle $(git ls-files '*.py') --count",
       "group": "test"
     },
     {
       "label": "Security Check with bandit",
       "type": "shell",
-      "command": ".venv/bin/python -m bandit $(git ls-files '*.py') -r -iii -ll",
+      "command": "poetry run python -m bandit $(git ls-files '*.py') -r -iii -ll",
       "group": "test"
     },
     {
       "label": "Lint with black",
       "type": "shell",
-      "command": ".venv/bin/python -m black $(git ls-files '*.py') --check",
+      "command": "poetry run python -m black $(git ls-files '*.py') --check",
       "group": "test"
     },
     {
