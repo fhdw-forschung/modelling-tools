@@ -1,5 +1,7 @@
 # This workflow runs python linting jobs
 
+name: Code Quality
+
 on:
   workflow_dispatch:
     inputs:
@@ -13,7 +15,7 @@ on:
       python-version:
         required: true
         type: string
-        default: "3.11"
+        default: ${{ vars.PYTHON_VERSION }}
   pull_request:
 
 jobs:

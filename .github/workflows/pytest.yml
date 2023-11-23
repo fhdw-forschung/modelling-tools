@@ -1,6 +1,8 @@
 # this workflow runs tests with pytest
 # it can be reused by other workflows; see: https://docs.github.com/en/actions/using-workflows/reusing-workflows#calling-a-reusable-workflow
 
+name: Testing
+
 on:
   workflow_dispatch:
     inputs:
@@ -14,7 +16,7 @@ on:
       python-version:
         required: true
         type: string
-        default: "3.11"
+        default: ${{ vars.PYTHON_VERSION }}
   push:
     branches: [main]
 
