@@ -7,25 +7,12 @@
 # - add git tag and push to remote
 # - create a release based on the Tag
 
-# procedure for manual run per trigger (not recommended, only in case previous failed):
-# - make changes; commit
-# - manually bump the version with Poetry; commit
-# - merge into main
-# - run the publish workflow
-
 # TODO: add predefined workflow to streamline procedure
 # https://github.com/marketplace/actions/github-release-from-tag
 
 name: Publish Package to PyPI
 
 on:
-  workflow_dispatch:
-    inputs:
-      python-version:
-        required: true
-        type: choice
-        options:
-          - "3.11"
   release:
     types: [published]
 
@@ -33,8 +20,16 @@ permissions:
   contents: read
 
 jobs:
+  call-lint-workflow:
+    uses: ./.github/workflows/lint-reusable.yml
+    name: Code Quality Check
+    with:
+      python-version: ${{ vars.PYTHON_VERSION }}
+
   call-test-workflow:
-    uses: ./.github/workflows/pytest.yml
+    uses: ./.github/workflows/pytest-reusable.yml
+    name: Run Testing with pytest
+    needs: call-lint-workflow
     with:
       python-version: ${{ vars.PYTHON_VERSION }}
 
@@ -78,7 +73,6 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ vars.PYTHON_VERSION }}
-          cache: "poetry"
 
       - name: Install dependencies
         run: |

@@ -1,50 +1,21 @@
-# this workflow runs tests with pytest
-# it can be reused by other workflows; see: https://docs.github.com/en/actions/using-workflows/reusing-workflows#calling-a-reusable-workflow
+# call to reusable / callable workflows
 
-name: Testing
+name: Testing with pytest
 
 on:
-  workflow_dispatch:
-    inputs:
-      python-version:
-        required: true
-        type: choice
-        options:
-          - "3.11"
-  workflow_call:
-    inputs:
-      python-version:
-        required: true
-        type: string
-        default: ${{ vars.PYTHON_VERSION }}
   push:
     branches: [main]
 
 jobs:
   call-lint-workflow:
-    uses: ./.github/workflows/lint.yml
+    uses: ./.github/workflows/lint-reusable.yml
+    name: Code Quality Check
     with:
-      python-version: ${{ inputs.python-version }}
+      python-version: ${{ vars.PYTHON_VERSION }}
 
-  Tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - uses: actions/setup-python@v4
-        with:
-          python-version: ${{ inputs.python-version }}
-          cache: "poetry"
-
-      - name: Get Active Python Version
-        run: |
-          python --version
-          pip --version
-
-      - run: pip install poetry
-
-      - name: Install Dependencies
-        run: poetry install
-
-      - name: Run Tests
-        run: poetry run pytest
+  call-test-workflow:
+    name: Run Testing with pytest
+    uses: ./.github/workflows/pytest-reusable.yml
+    needs: call-lint-workflow
+    with:
+      python-version: ${{ vars.PYTHON_VERSION }}
