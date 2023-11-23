@@ -1,6 +1,20 @@
 # This workflow will upload a Python Package using Pycaret when a release is created
 
-name: Upload Python Package
+# procedure for automatic Publish run (.github/workflows/publish.yml):
+# - make changes; commit
+# - manually bump the version with Poetry; commit
+# - merge into main
+# - add git tag and push to remote
+# - create a release based on the Tag
+
+# procedure for manual run per trigger (not recommended, only in case previous failed):
+# - make changes; commit
+# - manually bump the version with Poetry; commit
+# - merge into main
+# - run the publish workflow
+
+# TODO: add predefined workflow to streamline procedure
+# https://github.com/marketplace/actions/github-release-from-tag
 
 on:
   workflow_dispatch:
