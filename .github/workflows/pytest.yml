@@ -3,10 +3,20 @@
 
 on:
   workflow_call:
+    inputs:
+      python-version:
+        required: false
+        type: string
+        default: "3.11"
   push:
     branches: [main]
 
 jobs:
+  call-lint-workflow:
+    uses: ./.github/workflows/lint.yml
+    with:
+      python-version: ${{ inputs.python-version }}
+
   Tests:
     runs-on: ubuntu-latest
     steps:
@@ -17,7 +27,7 @@ jobs:
 
       - uses: actions/setup-python@v4
         with:
-          python-version: "3.11"
+          python-version: ${{ inputs.python-version }}
           cache: "poetry"
 
       - name: Install Dependencies
