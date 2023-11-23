@@ -1,0 +1,35 @@
+# this workflow runs tests with pytest
+# it can be reused by other workflows; see: https://docs.github.com/en/actions/using-workflows/reusing-workflows#calling-a-reusable-workflow
+
+on:
+  workflow_call:
+  push:
+    branches: [main]
+
+jobs:
+  test-reusable:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        id: setup_python
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.11"
+
+      - name: Cache Poetry environment
+        uses: actions/cache@v3
+        with:
+          key: venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version}}-${{ hashFiles('poetry.lock') }}
+          path: .venv
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install poetry
+          poetry config virtualenvs.in-project true
+          poetry install
+
+      - name: Run Tests
+        run: poetry run pytest fhdw/tests/
