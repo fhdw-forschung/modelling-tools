@@ -1,0 +1,105 @@
+# This workflow runs python linting jobs
+# reusable workflow; see: https://docs.github.com/en/actions/using-workflows/reusing-workflows#calling-a-reusable-workflow
+
+name: Code Quality Check (Reusable)
+
+on:
+  workflow_dispatch:
+    inputs:
+      python-version:
+        required: true
+        type: choice
+        options:
+          - "3.11"
+  workflow_call:
+    inputs:
+      python-version:
+        required: true
+        type: string
+        default: ${{ vars.PYTHON_VERSION }}
+
+jobs:
+  flake8:
+    name: Lint with flake8
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: pipx install poetry
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ inputs.python-version }}
+          cache: "poetry"
+      - name: Get Active Python Version
+        run: |
+          python --version
+          pip --version
+      - run: poetry install
+      - run: poetry run python -m flake8 $(git ls-files '*.py') --statistics --count
+
+  isort:
+    name: Lint with isort
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: pipx install poetry
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ inputs.python-version }}
+          cache: "poetry"
+      - name: Get Active Python Version
+        run: |
+          python --version
+          pip --version
+      - run: poetry install
+      - run: poetry run python -m isort $(git ls-files '*.py') --profile black --sl -c --diff
+
+  pydocstyle:
+    name: Lint with pydocstyle
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: pipx install poetry
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ inputs.python-version }}
+          cache: "poetry"
+      - name: Get Active Python Version
+        run: |
+          python --version
+          pip --version
+      - run: poetry install
+      - run: poetry run python -m pydocstyle $(git ls-files '*.py') --count
+
+  bandit:
+    name: Security Check with bandit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: pipx install poetry
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ inputs.python-version }}
+          cache: "poetry"
+      - name: Get Active Python Version
+        run: |
+          python --version
+          pip --version
+      - run: poetry install
+      - run: poetry run python -m bandit $(git ls-files '*.py') -r -iii -ll
+
+  black:
+    name: Lint with black
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: pipx install poetry
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ inputs.python-version }}
+          cache: "poetry"
+      - name: Get Active Python Version
+        run: |
+          python --version
+          pip --version
+      - run: poetry install
+      - run: poetry run python -m black $(git ls-files '*.py') --check

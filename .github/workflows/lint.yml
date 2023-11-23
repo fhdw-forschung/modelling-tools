@@ -1,0 +1,13 @@
+# call to reusable / callable workflows
+
+name: Code Quality Check
+
+on:
+  pull_request:
+
+jobs:
+  call-lint-workflow:
+    uses: ./.github/workflows/lint-reusable.yml
+    name: Code Quality Check
+    with:
+      python-version: ${{ vars.PYTHON_VERSION }}

@@ -1,0 +1,38 @@
+# this workflow runs tests with pytest
+# reusable workflow; see: https://docs.github.com/en/actions/using-workflows/reusing-workflows#calling-a-reusable-workflow
+
+name: Testing with pytest (Reusable)
+
+on:
+  workflow_dispatch:
+    inputs:
+      python-version:
+        required: true
+        type: choice
+        options:
+          - "3.11"
+  workflow_call:
+    inputs:
+      python-version:
+        required: true
+        type: string
+        default: ${{ vars.PYTHON_VERSION }}
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: pip install poetry
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ inputs.python-version }}
+          cache: "poetry"
+      - name: Get Active Python Version
+        run: |
+          python --version
+          pip --version
+      - name: Install Dependencies
+        run: poetry install
+      - name: Run Tests
+        run: poetry run pytest
