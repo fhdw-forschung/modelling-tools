@@ -18,6 +18,12 @@
 
 on:
   workflow_dispatch:
+    inputs:
+      python-version:
+        required: true
+        type: choice
+        options:
+          - "3.11"
   release:
     types: [published]
 

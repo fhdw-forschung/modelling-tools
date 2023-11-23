@@ -1,6 +1,13 @@
 # This workflow runs python linting jobs
 
 on:
+  workflow_dispatch:
+    inputs:
+      python-version:
+        required: true
+        type: choice
+        options:
+          - "3.11"
   workflow_call:
     inputs:
       python-version:

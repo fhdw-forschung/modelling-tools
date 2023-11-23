@@ -2,6 +2,13 @@
 # it can be reused by other workflows; see: https://docs.github.com/en/actions/using-workflows/reusing-workflows#calling-a-reusable-workflow
 
 on:
+  workflow_dispatch:
+    inputs:
+      python-version:
+        required: true
+        type: choice
+        options:
+          - "3.11"
   workflow_call:
     inputs:
       python-version:
