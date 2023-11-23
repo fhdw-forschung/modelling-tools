@@ -24,11 +24,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: pipx install poetry
+      - run: echo ${{ inputs.python-version }}
+      - run: echo ${{ vars.PYTHON_VERSION }}
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ inputs.python-version }}
           cache: "poetry"
+      - name: Get Active Python Version
+        run: |
+          python --version
+          pip --version
+      - run: pip install poetry
       - run: poetry install
       - run: poetry run python -m flake8 $(git ls-files '*.py') --statistics --count
 
@@ -37,11 +43,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: pipx install poetry
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ inputs.python-version }}
           cache: "poetry"
+      - name: Get Active Python Version
+        run: |
+          python --version
+          pip --version
+      - run: pip install poetry
       - run: poetry install
       - run: poetry run python -m isort $(git ls-files '*.py') --profile black --sl -c --diff
 
@@ -50,11 +60,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: pipx install poetry
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ inputs.python-version }}
           cache: "poetry"
+      - name: Get Active Python Version
+        run: |
+          python --version
+          pip --version
+      - run: pip install poetry
       - run: poetry install
       - run: poetry run python -m pydocstyle $(git ls-files '*.py') --count
 
@@ -63,11 +77,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: pipx install poetry
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ inputs.python-version }}
           cache: "poetry"
+      - name: Get Active Python Version
+        run: |
+          python --version
+          pip --version
+      - run: pip install poetry
       - run: poetry install
       - run: poetry run python -m bandit $(git ls-files '*.py') -r -iii -ll
 
@@ -76,10 +94,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: pipx install poetry
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ inputs.python-version }}
           cache: "poetry"
+      - name: Get Active Python Version
+        run: |
+          python --version
+          pip --version
+      - run: pip install poetry
       - run: poetry install
       - run: poetry run python -m black $(git ls-files '*.py') --check

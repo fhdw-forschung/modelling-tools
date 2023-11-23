@@ -31,13 +31,17 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install poetry
-        run: pipx install poetry
-
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ inputs.python-version }}
           cache: "poetry"
+
+      - name: Get Active Python Version
+        run: |
+          python --version
+          pip --version
+
+      - run: pip install poetry
 
       - name: Install Dependencies
         run: poetry install
