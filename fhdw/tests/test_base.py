@@ -2,6 +2,7 @@
 # pylint: disable=missing-function-docstring
 
 from fhdw.modelling.base import clean_string
+from fhdw.modelling.base import make_experiment_name
 
 
 # Test case for a basic string with special characters
@@ -51,3 +52,30 @@ def test_clean_string_special_characters_at_boundary():
     input_string = "!@#BoundaryTest!@#"
     expected_output = "boundarytest"
     assert clean_string(input_string) == expected_output
+
+
+# Test cases for make_experiment_name function
+
+
+def test_make_experiment_name_basic():
+    """Test make_experiment_name with a basic target."""
+    result = make_experiment_name("My-Target nr 1")
+    assert result == "my-target-nr-1"
+
+
+def test_make_experiment_name_with_prefix():
+    """Test make_experiment_name with a custom prefix."""
+    result = make_experiment_name("My_Target", prefix="custom_")
+    assert result == "custom_my_target"
+
+
+def test_make_experiment_name_special_characters():
+    """Test make_experiment_name with a target containing special characters."""
+    result = make_experiment_name("@My_Target!")
+    assert result == "my_target"
+
+
+def test_make_experiment_name_empty_prefix():
+    """Test make_experiment_name with an empty prefix."""
+    result = make_experiment_name("My_Target", prefix="")
+    assert result == "my_target"  # underscore defuined to be a word character in regex

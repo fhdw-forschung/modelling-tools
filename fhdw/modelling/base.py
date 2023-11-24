@@ -37,6 +37,3 @@ def make_experiment_name(target: str, prefix: str = ""):
     """
     clean_target_name = clean_string(target)
     return f"{prefix}{clean_target_name}"
-
-
-# myNEO_pycaret_

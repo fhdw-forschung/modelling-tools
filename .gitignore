@@ -160,5 +160,8 @@ cython_debug/
 #.idea/
 
 
+# CUSTOMIZATION
+models/*
+
 # vscode
 .vscode/settings.json
