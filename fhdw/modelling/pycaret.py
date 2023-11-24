@@ -15,7 +15,7 @@ def create_regression_model(
 ):
     """Create a regression model with Pycaret.
 
-    The model will be tuned and finalized. Models are saved to the
+    The model will be tuned and finalized. Models are saved to the `models` folder.
 
     Args:
         train_data: The training data.
