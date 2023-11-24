@@ -52,6 +52,7 @@
         },
         "editor.formatOnSave": true,
         "git.branchProtection": ["main"],
+        "isort.check": true,
         "jupyter.notebookFileRoot": "${workspaceFolder}",
         "notebook.diff.ignoreMetadata": true,
         "notebook.diff.ignoreOutputs": true,
