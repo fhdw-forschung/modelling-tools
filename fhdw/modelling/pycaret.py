@@ -46,7 +46,7 @@ def create_regression_model(
     finalized_model = exp.finalize_model(tuned_model)
 
     # model persistence
-    path_model = f"models/{experiment_prefix}{exp_name}"
+    path_model = f"models/{exp_name}"
     exp.save_model(model=finalized_model, model_name=path_model)
     print(f"saved model to '{path_model}'")
 
