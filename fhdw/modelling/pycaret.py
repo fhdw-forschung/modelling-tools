@@ -17,7 +17,17 @@ def create_regression_model(
 ):
     """Create a regression model with Pycaret.
 
-    The model will be tuned and finalized. Models are saved to the `models` folder.
+    This function is a wrapper and convenience function around already quite simplified
+    actions defined by pycaret. So, also have a look at the pycaret documentation.
+    Following pycaret mechanics are progressed through this function (in this order):
+    - create regression experiment (`RegressionExperiment`)
+    - set up regression experiment (`setup`)
+    - get best model (`compare_models`)
+    - create model with standard hyperparameters cross validation (`create_model`)
+    - tune model with cross validation (`tune_model`)
+    - final training including test data (`finalize_model`)
+    - the final model is saved to the `models` folder (`save_model`), which will be
+    created if not existing
 
     Args:
         train_data: The training data.
@@ -54,11 +64,18 @@ def create_regression_model(
     tuned_model = exp.tune_model(trained_model, choose_better=True)
     finalized_model = exp.finalize_model(tuned_model)
 
-    # model persistence
+    persist_model(experiment=exp, model=finalized_model, exp_name=exp_name)
+
+    return exp, finalized_model
+
+
+def persist_model(experiment, model, exp_name):
+    """Persist the given model.
+
+    Convenience function to manage `save_model` boilerplate.
+    """
     model_folder = Path("models")
     model_folder.mkdir(exist_ok=True)
     path_model = f"{model_folder}/{exp_name}"
-    exp.save_model(model=finalized_model, model_name=path_model)
+    experiment.save_model(model=model, model_name=path_model)
     print(f"saved model to '{path_model}'")
-
-    return exp, finalized_model
