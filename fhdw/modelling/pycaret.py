@@ -5,6 +5,7 @@ from pandas import DataFrame
 from pycaret.regression import RegressionExperiment
 
 from fhdw.modelling.base import make_experiment_name
+from fhdw.modelling.base import validate_path
 
 
 def create_regression_model(
@@ -117,3 +118,39 @@ def persist_model(experiment, model, exp_name):
     path_model = f"{model_folder}/{exp_name}"
     experiment.save_model(model=model, model_name=path_model)
     print(f"saved model to '{path_model}'")
+
+
+def get_model_paths(
+    folder: str = "models", file_extension: str = "pkl", stategy: str = "local"
+):
+    """Retrieves a list of model files from the specified folder and subfolders.
+
+    Recursive `Path.glob`.
+
+    Args:
+        folder (str, optional): Path to the folder containing model files. Defaults
+        to "models".
+
+        file_extension (str, optional): File extension for model files. Defaults to
+        "pkl".
+
+        strategy (str, optional): Retrieval strategy. Currently, only "local" strategy
+        is supported. Other strategies like MLFlow might be supported in the future.
+
+    Returns:
+        List[Path]: A list of Path objects representing the model files in the specified
+        folder.
+
+    Raises:
+        NotADirectoryError: If the specified folder does not exist or is not a
+        directory.
+
+        NotImplementedError: If an unsupported retrieval strategy is specified.
+    """
+    if not validate_path(folder):
+        raise NotADirectoryError(f"'{folder}' either not existing or not a folder.")
+
+    if stategy == "local":
+        return list(Path(folder).glob(f"**/*.{file_extension}"))
+
+    raise NotImplementedError("other strategies like e.g. MLFlow might follow.")
