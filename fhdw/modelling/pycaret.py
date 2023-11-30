@@ -69,6 +69,44 @@ def create_regression_model(
     return exp, finalized_model
 
 
+def persist_data(
+    experiment: RegressionExperiment,
+    folder: str = "experiments/data",
+    strategy: str = "local",
+):
+    """Persists the dataset from a RegressionExperiment.
+
+    Args:
+        experiment (RegressionExperiment): The experiment containing the dataset.
+
+        folder (str, optional): The folder path to save the dataset. Defaults to
+        "experiments/data".
+
+        strategy (str, optional): The strategy for saving the dataset. Defaults to
+        "local".
+
+    Returns:
+        str: The path where the dataset is saved.
+
+    Raises:
+        NotImplementedError: Raised when an unknown saving strategy is provided.
+
+    Example:
+        experiment = RegressionExperiment(...)
+        persist_data(experiment, folder="custom_folder", strategy="local")
+    """
+    data: DataFrame = experiment.dataset
+
+    if strategy == "local":
+        Path(folder).mkdir(exist_ok=True)
+        path = f"{folder}/{experiment.exp_name_log}.parquet"
+        print(f"saving dataset to '{path}'")
+        data.to_parquet(path)
+        return path
+
+    raise NotImplementedError("unknown saving strategy")
+
+
 def persist_model(experiment, model, exp_name):
     """Persist the given model.
 
