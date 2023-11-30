@@ -1,5 +1,6 @@
 """Test cases for the pycaret modelling tools."""
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 from pycaret.internal.pipeline import Pipeline
@@ -7,6 +8,7 @@ from pycaret.regression import RegressionExperiment
 from pycaret.regression import load_experiment
 
 from fhdw.modelling.pycaret import create_regression_model
+from fhdw.modelling.pycaret import get_model_paths
 from fhdw.modelling.pycaret import persist_data
 
 
@@ -61,3 +63,57 @@ def test_persist_data_explicit_notation(experiment, tmp_path):
     result = persist_data(experiment=experiment, strategy="local", folder=str(tmp_path))
     assert isinstance(result, str)
     assert Path(result).exists()
+
+
+@pytest.fixture(name="validate_path_mock")
+def mock_validate_path():
+    """Mock the validate function, since its functionality is assumed.
+
+    It is tested elsewhere.
+    """
+    with patch("fhdw.modelling.pycaret.validate_path") as mock:
+        # `validate_path` is from `base.py` but imported to `pycaret.py`
+        mock.return_value = True
+        yield mock
+
+
+def test_get_model_paths_default_parameters(validate_path_mock):
+    """Test get_model_paths with default parameters."""
+    result = get_model_paths()
+    validate_path_mock.assert_called_once_with("models")
+    assert result == list(Path("models").glob("**/*.pkl"))
+
+
+def test_get_model_paths_custom_folder(validate_path_mock):
+    """Test get_model_paths with a custom folder."""
+    custom_folder = "custom_models"
+    result = get_model_paths(folder=custom_folder)
+    validate_path_mock.assert_called_once_with(custom_folder)
+    assert result == list(Path(custom_folder).glob("**/*.pkl"))
+
+
+def test_get_model_paths_custom_extension(validate_path_mock):
+    """Test get_model_paths with a custom file extension."""
+    custom_extension = "h5"
+    result = get_model_paths(file_extension=custom_extension)
+    validate_path_mock.assert_called_once_with("models")
+    assert result == list(Path("models").glob(f"**/*.{custom_extension}"))
+
+
+def test_get_model_paths_custom_strategy():
+    """Test get_model_paths with a custom retrieval strategy."""
+    custom_strategy = "mlflow"
+    with pytest.raises(
+        NotImplementedError, match="other strategies like e.g. MLFlow might follow."
+    ):
+        get_model_paths(stategy=custom_strategy)
+
+
+def test_get_model_paths_invalid_folder(validate_path_mock):
+    """Test get_model_paths with an invalid folder."""
+    validate_path_mock.return_value = False
+    with pytest.raises(
+        NotADirectoryError,
+        match="'invalid_folder' either not existing or not a folder.",
+    ):
+        get_model_paths(folder="invalid_folder")

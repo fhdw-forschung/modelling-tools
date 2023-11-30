@@ -1,6 +1,7 @@
 """General Modelling Resources."""
 
 import re
+from pathlib import Path
 
 
 def clean_string(string: str):
@@ -37,3 +38,14 @@ def make_experiment_name(target: str, prefix: str = ""):
     """
     clean_target_name = clean_string(target)
     return f"{prefix}{clean_target_name}"
+
+
+def validate_path(folder_path: str):
+    """Validate the environment.
+
+    Model directory has to exist and contain at least one model file.
+    """
+    print("validating models path...")
+    if not Path(folder_path).is_dir():
+        return False
+    return True

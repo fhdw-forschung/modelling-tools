@@ -1,8 +1,11 @@
 """Test case definitions for modelling package."""
 # pylint: disable=missing-function-docstring
 
+from pathlib import Path
+
 from fhdw.modelling.base import clean_string
 from fhdw.modelling.base import make_experiment_name
+from fhdw.modelling.base import validate_path
 
 
 # Test case for a basic string with special characters
@@ -79,3 +82,38 @@ def test_make_experiment_name_empty_prefix():
     """Test make_experiment_name with an empty prefix."""
     result = make_experiment_name("My_Target", prefix="")
     assert result == "my_target"  # underscore defuined to be a word character in regex
+
+
+def test_valid_path():
+    """Test for a valid folder path."""
+    folder_path = "models"
+    assert validate_path(folder_path) is True
+
+
+def test_invalid_path():
+    """Test for an invalid folder path."""
+    folder_path = "/path/to/nonexistent/folder"
+    assert validate_path(folder_path) is False
+
+
+def test_empty_path():
+    """Test for an empty folder path."""
+    folder_path = ""
+    # resolves to current folder, therfore True
+    assert validate_path(folder_path) is True
+
+
+def test_valid_path_nonexistent_file(tmp_path):
+    """Test for a folder with no files.
+
+    Folder newly created; here a temp folder (pytest fixture).
+    """
+    assert validate_path(tmp_path) is True
+
+
+def test_valid_path_with_files(tmp_path):
+    """Test for a valid folder path with at least one model file."""
+    file_path = f"{tmp_path}/model1.pkl"
+    Path(file_path).touch()
+    assert validate_path(file_path) is False
+    assert validate_path(str(Path(file_path).parent)) is True
