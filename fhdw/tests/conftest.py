@@ -10,4 +10,4 @@ def sample_train_data():
     Returns:
         tuple: the pandas.DataFrame and the name of the target variable.
     """
-    return pd.read_csv("fhdw/tests/automobile.csv"), "price"
+    return pd.read_csv("fhdw/tests/data/automobile.csv"), "price"
