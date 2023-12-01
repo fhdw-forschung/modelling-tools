@@ -191,7 +191,7 @@ def persist_experiment(
     if strategy == "local":
         exp_folder = Path(folder)
         exp_folder.mkdir(exist_ok=True)
-        path_exp = f"{exp_folder}/{experiment.exp_name_log}"
+        path_exp = f"{exp_folder}/{experiment.exp_name_log}.exp"
         experiment.save_experiment(path_or_file=path_exp)
         print(f"saved experiment to '{path_exp}'")
         print("be aware: data must be saved separately!")
