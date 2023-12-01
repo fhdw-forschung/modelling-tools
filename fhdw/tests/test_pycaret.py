@@ -44,7 +44,7 @@ def mock_validate_path():
         yield mock
 
 
-@pytest.fixture
+@pytest.fixture(name="mock_experiment")
 def mock_regression_experiment():
     """Create Mock object with RegressionExperiment notation."""
     mock = MagicMock(spec=RegressionExperiment)
@@ -129,10 +129,10 @@ def test_get_model_paths_invalid_folder(validate_path_mock):
         get_model_paths(folder="invalid_folder")
 
 
-def test_persist_experiment_local_strategy(mock_regression_experiment, tmp_path):
+def test_persist_experiment_local_strategy(mock_experiment, tmp_path):
     """Test experiment persist in legal scenario."""
     # Arrange
-    experiment = mock_regression_experiment
+    experiment = mock_experiment
     folder = tmp_path
     strategy = "local"
 
@@ -140,14 +140,14 @@ def test_persist_experiment_local_strategy(mock_regression_experiment, tmp_path)
     result = persist_experiment(experiment, folder, strategy)
 
     # Assert
-    assert result == f"{folder}/{experiment.exp_name_log}"
+    assert result == f"{folder}/{experiment.exp_name_log}.exp"
     experiment.save_experiment.assert_called_once_with(path_or_file=result)
 
 
-def test_persist_experiment_unknown_strategy(mock_regression_experiment):
+def test_persist_experiment_unknown_strategy(mock_experiment):
     """Test experiment persist with unknown saving strategy."""
     # Arrange
-    experiment = mock_regression_experiment
+    experiment = mock_experiment
     folder = "experiments"
     strategy = "unknown_strategy"
 
