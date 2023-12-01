@@ -154,3 +154,47 @@ def get_model_paths(
         return list(Path(folder).glob(f"**/*.{file_extension}"))
 
     raise NotImplementedError("other strategies like e.g. MLFlow might follow.")
+
+
+def persist_experiment(
+    experiment: RegressionExperiment,
+    folder: str = "experiments",
+    strategy: str = "local",
+):
+    """Persist the given experiment.
+
+    Args:
+        experiment (RegressionExperiment): The experiment to be persisted.
+
+        folder (str, optional): The folder path where the experiment will be saved.
+        Defaults to "experiments".
+
+        strategy (str, optional): The saving strategy. Currently, only "local"
+        strategy is supported. Defaults to "local".
+
+    Returns:
+        str: The path where the experiment is saved.
+
+    Raises:
+        NotImplementedError: Raised when an unknown saving strategy is provided.
+
+    Note:
+        This function is a convenience wrapper for `exp.save_experiment` to simplify
+        boilerplate code.
+
+    Example:
+        >>> persist_experiment(
+                my_regression_exp, folder="saved_experiments", strategy="local"
+            )
+        'saved_experiments/my_experiment_log.pkl'
+    """
+    if strategy == "local":
+        exp_folder = Path(folder)
+        exp_folder.mkdir(exist_ok=True)
+        path_exp = f"{exp_folder}/{experiment.exp_name_log}"
+        experiment.save_experiment(path_or_file=path_exp)
+        print(f"saved experiment to '{path_exp}'")
+        print("be aware: data must be saved separately!")
+        return path_exp
+
+    raise NotImplementedError("unknown saving strategy")
