@@ -65,7 +65,7 @@ def create_regression_model(
     tuned_model = exp.tune_model(trained_model, choose_better=True)
     finalized_model = exp.finalize_model(tuned_model)
 
-    persist_model(experiment=exp, model=finalized_model, exp_name=exp_name)
+    persist_model(experiment=exp, model=finalized_model)
 
     return exp, finalized_model
 
@@ -81,7 +81,7 @@ def persist_data(
         experiment (RegressionExperiment): The experiment containing the dataset.
 
         folder (str, optional): The folder path to save the dataset. Defaults to
-        "experiments/data".
+        "experiments/data". Folder will be created if not existing.
 
         strategy (str, optional): The strategy for saving the dataset. Defaults to
         "local".
@@ -90,7 +90,7 @@ def persist_data(
         str: The path where the dataset is saved.
 
     Raises:
-        NotImplementedError: Raised when an unknown saving strategy is provided.
+        ValueError: Raised when an unknown saving strategy is provided.
 
     Example:
         experiment = RegressionExperiment(...)
@@ -101,35 +101,61 @@ def persist_data(
     if strategy == "local":
         Path(folder).mkdir(exist_ok=True)
         path = f"{folder}/{experiment.exp_name_log}.parquet"
-        print(f"saving dataset to '{path}'")
         data.to_parquet(path)
         return path
 
-    raise NotImplementedError("unknown saving strategy")
+    raise ValueError("unknown saving strategy")
 
 
-def persist_model(experiment, model, exp_name):
+def persist_model(
+    experiment: RegressionExperiment,
+    model,
+    folder: str = "models",
+    strategy: str = "local",
+):
     """Persist the given model.
 
-    Convenience function to manage `save_model` boilerplate.
+    Args:
+        experiment (RegressionExperiment): The regression experiment object.
+
+        model: The trained model to be persisted.
+
+        folder (str, optional): The folder where the model will be saved.
+        Defaults to "models".
+
+        strategy (str, optional): The saving strategy.
+        Currently, only "local" strategy is supported. Defaults to "local".
+
+    Returns:
+        Path: The path where the model is saved.
+
+    Raises:
+        ValueError: If an unknown saving strategy is provided.
+
+    Note:
+        This function is a convenience wrapper around the `save_model` method
+        of the provided `experiment` object. It automatically manages the
+        boilerplate code for saving the model with the appropriate name derived
+        from the experiment.
     """
-    model_folder = Path("models")
-    model_folder.mkdir(exist_ok=True)
-    path_model = f"{model_folder}/{exp_name}"
-    experiment.save_model(model=model, model_name=path_model)
-    print(f"saved model to '{path_model}'")
+    if strategy == "local":
+        model_folder = Path(folder)
+        model_folder.mkdir(exist_ok=True)
+        path_model = model_folder / Path(experiment.exp_name_log)
+        experiment.save_model(model=model, model_name=str(path_model))
+        return path_model
+
+    raise ValueError("unknown saving strategy")
 
 
-def get_model_paths(
-    folder: str = "models", file_extension: str = "pkl", stategy: str = "local"
-):
+def get_model_paths(folder: str = "models", stategy: str = "local"):
     """Retrieves a list of model files from the specified folder and subfolders.
 
     Recursive `Path.glob`.
 
     Args:
         folder (str, optional): Path to the folder containing model files. Defaults
-        to "models".
+        to "models". Folder will be created if not existing.
 
         file_extension (str, optional): File extension for model files. Defaults to
         "pkl".
@@ -145,15 +171,15 @@ def get_model_paths(
         NotADirectoryError: If the specified folder does not exist or is not a
         directory.
 
-        NotImplementedError: If an unsupported retrieval strategy is specified.
+        ValueError: If an unsupported retrieval strategy is specified.
     """
     if not validate_path(folder):
         raise NotADirectoryError(f"'{folder}' either not existing or not a folder.")
 
     if stategy == "local":
-        return list(Path(folder).glob(f"**/*.{file_extension}"))
+        return list(Path(folder).glob("**/*.pkl"))
 
-    raise NotImplementedError("other strategies like e.g. MLFlow might follow.")
+    raise ValueError("unknown saving strategy")
 
 
 def persist_experiment(
@@ -162,6 +188,9 @@ def persist_experiment(
     strategy: str = "local",
 ):
     """Persist the given experiment.
+
+    Saves the experiment with all configuration. The data must be saved separately.
+    You could use `persist_data` for this.
 
     Args:
         experiment (RegressionExperiment): The experiment to be persisted.
@@ -176,7 +205,7 @@ def persist_experiment(
         str: The path where the experiment is saved.
 
     Raises:
-        NotImplementedError: Raised when an unknown saving strategy is provided.
+        ValueError: Raised when an unknown saving strategy is provided.
 
     Note:
         This function is a convenience wrapper for `exp.save_experiment` to simplify
@@ -193,8 +222,6 @@ def persist_experiment(
         exp_folder.mkdir(exist_ok=True)
         path_exp = f"{exp_folder}/{experiment.exp_name_log}.exp"
         experiment.save_experiment(path_or_file=path_exp)
-        print(f"saved experiment to '{path_exp}'")
-        print("be aware: data must be saved separately!")
         return path_exp
 
-    raise NotImplementedError("unknown saving strategy")
+    raise ValueError("unknown saving strategy")

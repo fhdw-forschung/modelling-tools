@@ -73,7 +73,7 @@ def test_persist_data_unknown_strategy(experiment):
 
     should raise Notimplemented.
     """
-    with pytest.raises(NotImplementedError):
+    with pytest.raises(ValueError):
         persist_data(experiment=experiment, strategy="unknownlol", folder="")
 
 
@@ -102,20 +102,10 @@ def test_get_model_paths_custom_folder(validate_path_mock):
     assert result == list(Path(custom_folder).glob("**/*.pkl"))
 
 
-def test_get_model_paths_custom_extension(validate_path_mock):
-    """Test get_model_paths with a custom file extension."""
-    custom_extension = "h5"
-    result = get_model_paths(file_extension=custom_extension)
-    validate_path_mock.assert_called_once_with("models")
-    assert result == list(Path("models").glob(f"**/*.{custom_extension}"))
-
-
 def test_get_model_paths_custom_strategy():
     """Test get_model_paths with a custom retrieval strategy."""
     custom_strategy = "mlflow"
-    with pytest.raises(
-        NotImplementedError, match="other strategies like e.g. MLFlow might follow."
-    ):
+    with pytest.raises(ValueError, match="unknown saving strategy"):
         get_model_paths(stategy=custom_strategy)
 
 
@@ -152,5 +142,5 @@ def test_persist_experiment_unknown_strategy(mock_experiment):
     strategy = "unknown_strategy"
 
     # Act & Assert
-    with pytest.raises(NotImplementedError, match="unknown saving strategy"):
+    with pytest.raises(ValueError, match="unknown saving strategy"):
         persist_experiment(experiment, folder, strategy)
