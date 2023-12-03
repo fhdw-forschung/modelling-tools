@@ -66,8 +66,7 @@ def create_regression_model(
 
     # model creation with picking best model and tuning, up to finalization
     best_method = exp.compare_models(exclude=exclude, include=include, sort=sort_metric)
-    trained_model = exp.create_model(best_method)
-    tuned_model = exp.tune_model(trained_model, choose_better=True)
+    tuned_model = exp.tune_model(best_method, choose_better=True)
     final_model = exp.finalize_model(tuned_model)
 
     if save_strategy == "local":
