@@ -87,14 +87,15 @@ def test_persist_data_explicit_notation(experiment, tmp_path):
     assert Path(result).exists()
 
 
-def test_get_model_paths_default_parameters(validate_path_mock):
+def test_get_model_paths_default_parameters(validate_path_mock, tmp_path):
     """Test get_model_paths with default parameters."""
+    default_path = "artifacts/models"
     result = get_model_paths()
-    validate_path_mock.assert_called_once_with("models")
-    assert result == list(Path("models").glob("**/*.pkl"))
+    validate_path_mock.assert_called_once_with(default_path)
+    assert result == list(Path(default_path).glob("**/*.pkl"))
 
 
-def test_get_model_paths_custom_folder(validate_path_mock):
+def test_get_model_paths_custom_valid_folder(validate_path_mock):
     """Test get_model_paths with a custom folder."""
     custom_folder = "custom_models"
     result = get_model_paths(folder=custom_folder)
@@ -102,11 +103,11 @@ def test_get_model_paths_custom_folder(validate_path_mock):
     assert result == list(Path(custom_folder).glob("**/*.pkl"))
 
 
-def test_get_model_paths_custom_strategy():
+def test_get_model_paths_custom_strategy_valid_path(tmp_path):
     """Test get_model_paths with a custom retrieval strategy."""
     custom_strategy = "mlflow"
     with pytest.raises(ValueError, match="unknown saving strategy"):
-        get_model_paths(stategy=custom_strategy)
+        get_model_paths(folder=tmp_path, stategy=custom_strategy)
 
 
 def test_get_model_paths_invalid_folder(validate_path_mock):
