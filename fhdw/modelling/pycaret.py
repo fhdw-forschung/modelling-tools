@@ -1,4 +1,4 @@
-"""Modelling resources utiliying pycaret for the process."""
+"""Modelling process resources utilizing pycaret."""
 from pathlib import Path
 
 from pandas import DataFrame
@@ -11,10 +11,11 @@ from fhdw.modelling.base import validate_path
 def create_regression_model(
     train_data: DataFrame,
     target: str,
-    prefix: str = "",
-    sort_metric: str = "RMSE",
     exclude: list | None = None,
     include: list | None = None,
+    sort_metric: str = "RMSE",
+    prefix: str = "",
+    save_strategy: str | None = None,
 ):
     """Create a regression model with Pycaret.
 
@@ -27,24 +28,28 @@ def create_regression_model(
     - create model with standard hyperparameters cross validation (`create_model`)
     - tune model with cross validation (`tune_model`)
     - final training including test data (`finalize_model`)
-    - the final model is saved to the `models` folder (`save_model`), which will be
-    created if not existing
+    - artifacts and input of the process will be saved (optionally) to the `artifacts`
+    folder which will be created if not existing.
 
     Args:
         train_data: The training data.
 
         target: The name of the target variable in the train data.
 
-        prefix: A Prefix that will be added to all names that are given in the process.
-        This is e.g. the experiment name or the name of the model that is saved locally.
-
-        sort_metric (str): The metric used to sort the models.
-
         exclude_models (List[str]): A list of model names to exclude from comparison.
         Cannot be used in conjunction with `include_models`.
 
         include_models (List[str]): A list of model names to include in comparison.
         Cannot be used in conjunction with `exclude_models`.
+
+        sort_metric (str): The metric used to sort the models.
+
+        prefix: A Prefix that will be added to all names that are given in the process.
+        This may help to further organize experiments. Therefore it will be used as
+        additional subfolder for the process's artifacts.
+
+        save_strategy (str, optional): The strategy for saving artifacts. When "local",
+        save in local `artifacts` folder. Defaults to `None`, i.e. save nothing.
 
     Returns:
         tuple: The RegressionExperiment and the trained Pipeline containing the model.
@@ -63,16 +68,22 @@ def create_regression_model(
     best_method = exp.compare_models(exclude=exclude, include=include, sort=sort_metric)
     trained_model = exp.create_model(best_method)
     tuned_model = exp.tune_model(trained_model, choose_better=True)
-    finalized_model = exp.finalize_model(tuned_model)
+    final_model = exp.finalize_model(tuned_model)
 
-    persist_model(experiment=exp, model=finalized_model)
+    if save_strategy == "local":
+        # saving artifacts
+        persist_experiment(experiment=exp, strategy=save_strategy)
+        persist_data(experiment=exp, strategy=save_strategy)
+        persist_model(experiment=exp, model=final_model, strategy=save_strategy)
+    elif save_strategy is not None:
+        raise ValueError("unknown saving strategy")
 
-    return exp, finalized_model
+    return exp, final_model
 
 
 def persist_data(
     experiment: RegressionExperiment,
-    folder: str = "experiments/data",
+    folder: str = "artifacts/data",
     strategy: str = "local",
 ):
     """Persists the dataset from a RegressionExperiment.
@@ -110,7 +121,7 @@ def persist_data(
 def persist_model(
     experiment: RegressionExperiment,
     model,
-    folder: str = "models",
+    folder: str = "artifacts/models",
     strategy: str = "local",
 ):
     """Persist the given model.
@@ -148,7 +159,7 @@ def persist_model(
     raise ValueError("unknown saving strategy")
 
 
-def get_model_paths(folder: str = "models", stategy: str = "local"):
+def get_model_paths(folder: str = "artifacts/models", stategy: str = "local"):
     """Retrieves a list of model files from the specified folder and subfolders.
 
     Recursive `Path.glob`.
@@ -184,7 +195,7 @@ def get_model_paths(folder: str = "models", stategy: str = "local"):
 
 def persist_experiment(
     experiment: RegressionExperiment,
-    folder: str = "experiments",
+    folder: str = "artifacts/experiments",
     strategy: str = "local",
 ):
     """Persist the given experiment.
