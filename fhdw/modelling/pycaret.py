@@ -69,6 +69,10 @@ def create_regression_model(
     tuned_model = exp.tune_model(best_method, choose_better=True)
     final_model = exp.finalize_model(tuned_model)
 
+    reg = exp.create_model(best_method)
+    exp.ensemble_model(estimator=reg, choose_better=True, method="Bagging")
+    exp.ensemble_model(estimator=reg, choose_better=True, method="Boosting")
+
     if save_strategy == "local":
         # saving artifacts
         persist_experiment(experiment=exp, strategy=save_strategy)
