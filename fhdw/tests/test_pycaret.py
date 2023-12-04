@@ -1,7 +1,6 @@
 """Test cases for the pycaret modelling tools."""
 from pathlib import Path
 from unittest.mock import MagicMock
-from unittest.mock import patch
 
 import pytest
 from pycaret.regression import RegressionExperiment
@@ -29,18 +28,6 @@ def dummy_experiment(sample_train_data):
         exp = load_experiment(path_or_file=exp_path, data=train_data)
 
     return exp
-
-
-@pytest.fixture(name="validate_path_mock")
-def mock_validate_path():
-    """Mock the validate function, since its functionality is assumed.
-
-    It is tested elsewhere.
-    """
-    with patch("fhdw.modelling.pycaret.validate_path") as mock:
-        # `validate_path` is from `base.py` but imported to `pycaret.py`
-        mock.return_value = True
-        yield mock
 
 
 @pytest.fixture(name="mock_experiment")
@@ -71,7 +58,7 @@ def test_persist_data_unknown_strategy(experiment):
 
     should raise Notimplemented.
     """
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="unknown saving strategy"):
         persist_data(experiment=experiment, strategy="unknownlol", folder="")
 
 
@@ -85,20 +72,17 @@ def test_persist_data_explicit_notation(experiment, tmp_path):
     assert Path(result).exists()
 
 
-def test_get_model_paths_default_parameters(validate_path_mock):
+def test_get_model_paths_default_parameters():
     """Test get_model_paths with default parameters."""
     default_path = "artifacts/models"
     result = get_model_paths()
-    validate_path_mock.assert_called_once_with(default_path)
     assert result == list(Path(default_path).glob("**/*.pkl"))
 
 
-def test_get_model_paths_custom_valid_folder(validate_path_mock):
+def test_get_model_paths_custom_valid_folder(tmp_path):
     """Test get_model_paths with a custom folder."""
-    custom_folder = "custom_models"
-    result = get_model_paths(folder=custom_folder)
-    validate_path_mock.assert_called_once_with(custom_folder)
-    assert result == list(Path(custom_folder).glob("**/*.pkl"))
+    result = get_model_paths(folder=tmp_path)  # temp folder as custom folder
+    assert result == list(Path(tmp_path).glob("**/*.pkl"))
 
 
 def test_get_model_paths_custom_strategy_valid_path(tmp_path):
@@ -108,9 +92,8 @@ def test_get_model_paths_custom_strategy_valid_path(tmp_path):
         get_model_paths(folder=tmp_path, stategy=custom_strategy)
 
 
-def test_get_model_paths_invalid_folder(validate_path_mock):
+def test_get_model_paths_invalid_folder():
     """Test get_model_paths with an invalid folder."""
-    validate_path_mock.return_value = False
     with pytest.raises(
         NotADirectoryError,
         match="'invalid_folder' either not existing or not a folder.",
