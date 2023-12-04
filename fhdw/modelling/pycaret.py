@@ -9,13 +9,14 @@ from fhdw.modelling.base import validate_path
 
 
 def create_regression_model(
-    train_data: DataFrame,
+    data: DataFrame,
     target: str,
     exclude: list | None = None,
     include: list | None = None,
     sort_metric: str = "RMSE",
     prefix: str = "",
     save_strategy: str | None = None,
+    verbose: bool = False,
 ):
     """Create a regression model with Pycaret.
 
@@ -35,6 +36,7 @@ def create_regression_model(
     - create an ensemble with this single-method model with boosting procedure
     - create a stacked estimator comprised of the three best methods from comparison;
     the meta-learner is `LinearRegression`
+
     - artifacts and input of the process will be saved (optionally) to the `artifacts`
     folder which will be created if not existing.
 
@@ -70,27 +72,37 @@ def create_regression_model(
 
     # experiment setup
     exp = RegressionExperiment()
-    exp.setup(data=train_data, target=target, experiment_name=exp_name)
+    exp.setup(data=data, target=target, experiment_name=exp_name, verbose=verbose)
 
-    # model creation with picking best model and tuning, up to finalization
+    # model tuning with best method
     best_methods = exp.compare_models(
-        exclude=exclude, include=include, sort=sort_metric, n_select=3
+        exclude=exclude, include=include, sort=sort_metric, n_select=3, verbose=verbose
     )
-    exp.tune_model(best_methods[0], choose_better=True)
+    reg = exp.create_model(best_methods[0], verbose=verbose)
+    tuned = exp.tune_model(reg, choose_better=True, verbose=verbose)
 
-    reg = exp.create_model(best_methods[0])
-    exp.ensemble_model(estimator=reg, choose_better=True, method="Bagging")
-    exp.ensemble_model(estimator=reg, choose_better=True, method="Boosting")
-
-    exp.stack_models(estimator_list=best_methods, choose_better=True, restack=False)
+    # ensemble best methods, after creating the initial model
+    exp.ensemble_model(
+        estimator=tuned, choose_better=True, method="Bagging", verbose=verbose
+    )
+    exp.ensemble_model(
+        estimator=tuned, choose_better=True, method="Boosting", verbose=verbose
+    )
+    exp.stack_models(
+        estimator_list=best_methods, choose_better=True, restack=False, verbose=verbose
+    )
 
     best_model = exp.automl(optimize=sort_metric)
 
     if save_strategy == "local":
         # saving artifacts
-        persist_experiment(experiment=exp, strategy=save_strategy)
-        persist_data(experiment=exp, strategy=save_strategy)
-        persist_model(experiment=exp, model=best_model, strategy=save_strategy)
+        path_e = persist_experiment(experiment=exp, strategy=save_strategy)
+        path_d = persist_data(experiment=exp, strategy=save_strategy)
+        path_m = persist_model(experiment=exp, model=best_model, strategy=save_strategy)
+        if verbose:
+            print(f"saved experiment to: '{path_e}'")
+            print(f"saved data to: '{path_d}'")
+            print(f"saved best model to: '{path_m}.pkl'")
     elif save_strategy is not None:
         raise ValueError("unknown saving strategy")
 
@@ -126,7 +138,7 @@ def persist_data(
     data: DataFrame = experiment.dataset
 
     if strategy == "local":
-        Path(folder).mkdir(exist_ok=True)
+        Path(folder).mkdir(parents=True, exist_ok=True)
         path = f"{folder}/{experiment.exp_name_log}.parquet"
         data.to_parquet(path)
         return path
@@ -167,7 +179,7 @@ def persist_model(
     """
     if strategy == "local":
         model_folder = Path(folder)
-        model_folder.mkdir(exist_ok=True)
+        model_folder.mkdir(parents=True, exist_ok=True)
         path_model = model_folder / Path(experiment.exp_name_log)
         experiment.save_model(model=model, model_name=str(path_model))
         return path_model
@@ -246,7 +258,7 @@ def persist_experiment(
     """
     if strategy == "local":
         exp_folder = Path(folder)
-        exp_folder.mkdir(exist_ok=True)
+        exp_folder.mkdir(parents=True, exist_ok=True)
         path_exp = f"{exp_folder}/{experiment.exp_name_log}.exp"
         experiment.save_experiment(path_or_file=path_exp)
         return path_exp
