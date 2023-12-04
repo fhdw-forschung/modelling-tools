@@ -5,7 +5,6 @@ from pandas import DataFrame
 from pycaret.regression import RegressionExperiment
 
 from fhdw.modelling.base import make_experiment_name
-from fhdw.modelling.base import validate_path
 
 
 def create_regression_model(
@@ -212,7 +211,7 @@ def get_model_paths(folder: str = "artifacts/models", stategy: str = "local"):
 
         ValueError: If an unsupported retrieval strategy is specified.
     """
-    if not validate_path(folder):
+    if not Path(folder).is_dir():
         raise NotADirectoryError(f"'{folder}' either not existing or not a folder.")
 
     if stategy == "local":
