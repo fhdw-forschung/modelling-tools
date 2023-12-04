@@ -163,6 +163,7 @@ cython_debug/
 # CUSTOMIZATION
 models/*
 experiments/*
+artifacts/*
 
 # vscode
 .vscode/settings.json
