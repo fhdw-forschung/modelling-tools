@@ -4,7 +4,6 @@ from unittest.mock import MagicMock
 from unittest.mock import patch
 
 import pytest
-from pycaret.internal.pipeline import Pipeline
 from pycaret.regression import RegressionExperiment
 from pycaret.regression import load_experiment
 
@@ -60,12 +59,11 @@ def test_create_regression_model_minimal(sample_train_data):
     exp, model = create_regression_model(
         train_data,
         target,
-        include=["knn"],
+        include=["knn", "en", "ridge", "dt"],
     )
     print(type(model))
 
     assert isinstance(exp, RegressionExperiment)
-    assert isinstance(model, Pipeline)
 
 
 def test_persist_data_unknown_strategy(experiment):
@@ -87,7 +85,7 @@ def test_persist_data_explicit_notation(experiment, tmp_path):
     assert Path(result).exists()
 
 
-def test_get_model_paths_default_parameters(validate_path_mock, tmp_path):
+def test_get_model_paths_default_parameters(validate_path_mock):
     """Test get_model_paths with default parameters."""
     default_path = "artifacts/models"
     result = get_model_paths()

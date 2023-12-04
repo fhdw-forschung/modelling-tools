@@ -21,13 +21,20 @@ def create_regression_model(
 
     This function is a wrapper and convenience function around already quite simplified
     actions defined by pycaret. So, also have a look at the pycaret documentation.
-    Following pycaret mechanics are progressed through this function (in this order):
+
+    This convenience functions performs several steps, which strive for the best model
+    possible, with minimal configuration provided. Therefore the runtime can be quite
+    long. The following pycaret mechanics are progressed (in this order):
     - create regression experiment (`RegressionExperiment`)
     - set up regression experiment (`setup`)
-    - get best model (`compare_models`)
-    - create model with standard hyperparameters cross validation (`create_model`)
-    - tune model with cross validation (`tune_model`)
-    - final training including test data (`finalize_model`)
+    - get the three best performing ML-methods (`compare_models`)
+    - create and tune a model with the best method incl. cross validation (`tune_model`)
+    - create a (single-method) model with standard hyperparameters cross validation
+    (`create_model`) with the best performing ML-method from previous `compare_models`
+    - create an ensemble with this single-method model with bagging procedure
+    - create an ensemble with this single-method model with boosting procedure
+    - create a stacked estimator comprised of the three best methods from comparison;
+    the meta-learner is `LinearRegression`
     - artifacts and input of the process will be saved (optionally) to the `artifacts`
     folder which will be created if not existing.
 
@@ -44,18 +51,19 @@ def create_regression_model(
 
         sort_metric (str): The metric used to sort the models.
 
-        prefix: A Prefix that will be added to all names that are given in the process.
-        This may help to further organize experiments. Therefore it will be used as
-        additional subfolder for the process's artifacts.
+        prefix: A Prefix that will be added to the experiment name. This may help to
+        further organize experiments.
 
         save_strategy (str, optional): The strategy for saving artifacts. When "local",
         save in local `artifacts` folder. Defaults to `None`, i.e. save nothing.
 
     Returns:
-        tuple: The RegressionExperiment and the trained Pipeline containing the model.
+        The `RegressionExperiment` and the tuned Pipeline containing the model.
     """
     if exclude and include:
         raise ValueError("Cannot use both 'include' and 'exclude'.")
+    if include and len(include) < 3:
+        raise ValueError("When using include, provide at least three choices.")
 
     exp_name = make_experiment_name(target=target, prefix=prefix)
     print(f"experiment name: '{exp_name}'")
@@ -65,23 +73,26 @@ def create_regression_model(
     exp.setup(data=train_data, target=target, experiment_name=exp_name)
 
     # model creation with picking best model and tuning, up to finalization
-    best_method = exp.compare_models(exclude=exclude, include=include, sort=sort_metric)
-    tuned_model = exp.tune_model(best_method, choose_better=True)
-    final_model = exp.finalize_model(tuned_model)
+    best_methods = exp.compare_models(
+        exclude=exclude, include=include, sort=sort_metric, n_select=3
+    )
+    tuned_model = exp.tune_model(best_methods[0], choose_better=True)
 
-    reg = exp.create_model(best_method)
+    reg = exp.create_model(best_methods[0])
     exp.ensemble_model(estimator=reg, choose_better=True, method="Bagging")
     exp.ensemble_model(estimator=reg, choose_better=True, method="Boosting")
+
+    exp.stack_models(estimator_list=best_methods, choose_better=True, restack=False)
 
     if save_strategy == "local":
         # saving artifacts
         persist_experiment(experiment=exp, strategy=save_strategy)
         persist_data(experiment=exp, strategy=save_strategy)
-        persist_model(experiment=exp, model=final_model, strategy=save_strategy)
+        persist_model(experiment=exp, model=tuned_model, strategy=save_strategy)
     elif save_strategy is not None:
         raise ValueError("unknown saving strategy")
 
-    return exp, final_model
+    return exp, tuned_model
 
 
 def persist_data(
