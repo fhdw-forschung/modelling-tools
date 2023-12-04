@@ -1,25 +1,26 @@
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
-
-[project.urls]
-"Homepage" = "https://github.com/fhdw-forschung/modelling-tools"
-"Bug Tracker" = "https://github.com/fhdw-forschung/modelling-tools/issues"
 
 [tool.poetry]
 name = "fhdw-modelling"
-version = "2.0.0"
+version = "3.0.0"
 description = "A collection of modelling tools. Intended for generic usage in FHDW projects."
 authors = ["Pascal Niggemeier <pascal.niggemeier@fhdw.de>"]
 license = "MPL-2.0"
 readme = "README.md"
-packages = [{include = "fhdw"}]
+repository = "https://github.com/fhdw-forschung/modelling-tools"
+packages = [{ include = "fhdw" }]
+
+[tool.poetry.urls]
+"Bug Tracker" = "https://github.com/fhdw-forschung/modelling-tools/issues"
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.12"
 kaleido = "0.2.1"
-pycaret = ">=3.2.0"
+pycaret = { version = "^3.2.0", extras = ["mlops"] }
 pyarrow = "^14.0.1"
+fastapi = "^0.104.1"
 
 [tool.poetry.group.dev.dependencies]
 bandit = "^1.7.5"

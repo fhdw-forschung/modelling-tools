@@ -164,6 +164,7 @@ cython_debug/
 models/*
 experiments/*
 artifacts/*
+mlruns/*
 
 # vscode
 .vscode/settings.json

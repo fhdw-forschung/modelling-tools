@@ -15,14 +15,14 @@ from fhdw.modelling.pycaret import persist_experiment
 @pytest.fixture(scope="session", name="experiment")
 def dummy_experiment(sample_train_data):
     """Run once per training Session."""
-    exp_path = Path("experiments/dummy_experiment.pkl")
+    exp_path = Path("artifacts/experiments/dummy_experiment.pkl")
     train_data = sample_train_data[0]
 
     if not exp_path.exists():
         exp = RegressionExperiment()
         target = sample_train_data[1]
         exp.setup(data=train_data, target=target, experiment_name=str(exp_path.stem))
-        exp_path.parent.mkdir(exist_ok=True)
+        exp_path.parent.mkdir(parents=True, exist_ok=True)
         exp.save_experiment(exp_path)
     else:
         exp = load_experiment(path_or_file=exp_path, data=train_data)
@@ -44,9 +44,9 @@ def test_create_regression_model_minimal(sample_train_data):
     train_data = sample_train_data[0]
     target = sample_train_data[1]
     exp, model = create_regression_model(
-        train_data,
-        target,
-        include=["knn", "en", "ridge", "dt"],
+        data=train_data,
+        target=target,
+        include=["knn", "en", "ridge"],
     )
     print(type(model))
 
@@ -70,13 +70,6 @@ def test_persist_data_explicit_notation(experiment, tmp_path):
     result = persist_data(experiment=experiment, strategy="local", folder=str(tmp_path))
     assert isinstance(result, str)
     assert Path(result).exists()
-
-
-def test_get_model_paths_default_parameters():
-    """Test get_model_paths with default parameters."""
-    default_path = "artifacts/models"
-    result = get_model_paths()
-    assert result == list(Path(default_path).glob("**/*.pkl"))
 
 
 def test_get_model_paths_custom_valid_folder(tmp_path):

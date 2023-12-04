@@ -77,6 +77,7 @@
         "ms-python.vscode-pylance",
         "ms-toolsai.jupyter",
         "ms-vscode.live-server",
+        "tamasfe.even-better-toml",
         "visualstudioexptteam.vscodeintellicode",
         "yzhang.markdown-all-in-one"
       ]

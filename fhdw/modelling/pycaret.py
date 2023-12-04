@@ -16,6 +16,7 @@ def create_regression_model(
     prefix: str = "",
     save_strategy: str | None = None,
     verbose: bool = False,
+    log_experiment: bool = False,
 ):
     """Create a regression model with Pycaret.
 
@@ -58,6 +59,12 @@ def create_regression_model(
         save_strategy (str, optional): The strategy for saving artifacts. When "local",
         save in local `artifacts` folder. Defaults to `None`, i.e. save nothing.
 
+        verbose (bool, optional): Whether to print training output. This affects all
+        training steps.
+
+        log_experiment (bool, optional): Whether to log via MLFlow. Activates logs for
+        experiment, data and plots.
+
     Returns:
         The `RegressionExperiment` and the tuned Pipeline containing the model.
     """
@@ -71,7 +78,15 @@ def create_regression_model(
 
     # experiment setup
     exp = RegressionExperiment()
-    exp.setup(data=data, target=target, experiment_name=exp_name, verbose=verbose)
+    exp.setup(
+        data=data,
+        target=target,
+        experiment_name=exp_name,
+        verbose=verbose,
+        log_experiment=log_experiment,
+        log_data=log_experiment,
+        log_plots=log_experiment,
+    )
 
     # model tuning with best method
     best_methods = exp.compare_models(
