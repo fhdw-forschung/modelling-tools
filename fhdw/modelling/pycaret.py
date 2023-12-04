@@ -76,7 +76,7 @@ def create_regression_model(
     best_methods = exp.compare_models(
         exclude=exclude, include=include, sort=sort_metric, n_select=3
     )
-    tuned_model = exp.tune_model(best_methods[0], choose_better=True)
+    exp.tune_model(best_methods[0], choose_better=True)
 
     reg = exp.create_model(best_methods[0])
     exp.ensemble_model(estimator=reg, choose_better=True, method="Bagging")
@@ -84,15 +84,17 @@ def create_regression_model(
 
     exp.stack_models(estimator_list=best_methods, choose_better=True, restack=False)
 
+    best_model = exp.automl(optimize=sort_metric)
+
     if save_strategy == "local":
         # saving artifacts
         persist_experiment(experiment=exp, strategy=save_strategy)
         persist_data(experiment=exp, strategy=save_strategy)
-        persist_model(experiment=exp, model=tuned_model, strategy=save_strategy)
+        persist_model(experiment=exp, model=best_model, strategy=save_strategy)
     elif save_strategy is not None:
         raise ValueError("unknown saving strategy")
 
-    return exp, tuned_model
+    return exp, best_model
 
 
 def persist_data(
