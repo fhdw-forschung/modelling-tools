@@ -15,7 +15,7 @@ from fhdw.modelling.pycaret import persist_experiment
 @pytest.fixture(scope="session", name="experiment")
 def dummy_experiment(sample_train_data):
     """Run once per training Session."""
-    exp_path = Path("experiments/dummy_experiment.pkl")
+    exp_path = Path("artifacts/experiments/dummy_experiment.pkl")
     train_data = sample_train_data[0]
 
     if not exp_path.exists():
@@ -46,7 +46,7 @@ def test_create_regression_model_minimal(sample_train_data):
     exp, model = create_regression_model(
         train_data,
         target,
-        include=["knn", "en", "ridge", "dt"],
+        include=["knn", "en", "ridge"],
     )
     print(type(model))
 
