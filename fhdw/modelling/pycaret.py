@@ -104,7 +104,7 @@ def create_regression_model(
             estimator=tuned, choose_better=True, method="Boosting", verbose=verbose
         )
     except TypeError:
-        print("Skipped boosting ensemble. Estimator not supported.")
+        print(f"Skipped boosting ensemble. Estimator {tuned} not supported.")
 
     exp.stack_models(
         estimator_list=best_methods, choose_better=True, restack=False, verbose=verbose
