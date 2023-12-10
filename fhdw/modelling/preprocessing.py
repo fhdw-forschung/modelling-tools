@@ -5,7 +5,7 @@ from pandas import DataFrame
 
 
 def combine_and_update(df1: DataFrame, df2: DataFrame):
-    """Combine two pandas DataFrames and use values from other if possible.
+    """Combine two pandas DataFrames and update values of first DataFrame.
 
     Updates the values of the first DataFrame with the non-null values from the second
     DataFrame.

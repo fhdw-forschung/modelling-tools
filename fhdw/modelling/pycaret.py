@@ -17,6 +17,7 @@ def create_regression_model(
     save_strategy: str | None = None,
     verbose: bool = False,
     log_experiment: bool = False,
+    **kwargs,
 ):
     """Create a regression model with Pycaret.
 
@@ -86,6 +87,7 @@ def create_regression_model(
         log_experiment=log_experiment,
         log_data=log_experiment,
         log_plots=log_experiment,
+        **kwargs,
     )
 
     # model tuning with best method
