@@ -53,6 +53,20 @@ def test_create_regression_model_minimal(sample_train_data):
     assert isinstance(exp, RegressionExperiment)
 
 
+def test_create_experiment_with_kwargs(sample_train_data):
+    """Check if setup of experiment with kwargs sets configuration correctly."""
+    train_data = sample_train_data[0]
+    target = sample_train_data[1]
+    exp, model = create_regression_model(
+        data=train_data,
+        target=target,
+        include=["knn", "en", "ridge"],
+        transform_target=True,
+    )
+    config_tt = exp.get_config("transform_target_param")
+    assert config_tt is True
+
+
 def test_persist_data_unknown_strategy(experiment):
     """Test model persistence with unknown strategy.
 
