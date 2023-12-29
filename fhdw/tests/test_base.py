@@ -66,8 +66,14 @@ def test_make_experiment_name_basic():
 
 def test_make_experiment_name_with_prefix():
     """Test make_experiment_name with a custom prefix."""
-    result = make_experiment_name("My_Target", prefix="custom_")
-    assert result == "custom_my_target"
+    result = make_experiment_name("My_Target", prefix="custom")
+    assert result == "custom-my_target"
+
+
+def test_make_experiment_name_with_separator():
+    """Test make_experiment_name with a custom prefix."""
+    result = make_experiment_name("My_Target", prefix="custom", sep=":")
+    assert result == "custom:my_target"
 
 
 def test_make_experiment_name_special_characters():
@@ -80,3 +86,11 @@ def test_make_experiment_name_empty_prefix():
     """Test make_experiment_name with an empty prefix."""
     result = make_experiment_name("My_Target", prefix="")
     assert result == "my_target"  # underscore defuined to be a word character in regex
+
+
+def test_make_experiment_name_unclean_prefix():
+    """Test case for make_experiment_name with an unclean prefix."""
+    target = "TestTarget"
+    prefix = "Test@#$Target"
+    result = make_experiment_name(target=target, prefix=prefix)
+    assert result == "test-target-testtarget"
