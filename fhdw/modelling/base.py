@@ -21,7 +21,7 @@ def clean_string(string: str):
     return cleaned.lower()
 
 
-def make_experiment_name(target: str, prefix: str = ""):
+def make_experiment_name(target: str, prefix: str = "", sep: str = "-"):
     """Generate a standardized experiment name based on the target variable.
 
     Clean the target variable by removing special characters and converting it to
@@ -32,8 +32,11 @@ def make_experiment_name(target: str, prefix: str = ""):
 
         prefix (str, optional): An optional prefix to be added to the experiment name.
 
+        sep (str, optional): An optional seperator, placed between prefix and name.
+
     Returns:
     - str: A formatted experiment name in the pattern '{prefix}{cleaned_target}'.
     """
     clean_target_name = clean_string(target)
-    return f"{prefix}{clean_target_name}"
+    clean_prefix_name = clean_string(prefix)
+    return sep.join(part for part in [clean_prefix_name, clean_target_name] if part)
