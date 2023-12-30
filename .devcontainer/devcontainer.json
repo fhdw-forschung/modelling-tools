@@ -23,6 +23,8 @@
   // add GPU support to the container in case the host supports it
   "hostRequirements": { "gpu": "optional" },
 
+  "runArgs": ["--network=host", "--env-file", ".devcontainer/devcontainer.env"],
+
   // Configure tool-specific properties.
   "customizations": {
     "vscode": {
