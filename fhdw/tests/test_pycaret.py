@@ -7,6 +7,7 @@ from pycaret.regression import RegressionExperiment
 from pycaret.regression import load_experiment
 from sklearn.ensemble import AdaBoostRegressor
 from sklearn.ensemble import BaggingRegressor
+from sklearn.ensemble import StackingRegressor
 from sklearn.linear_model._coordinate_descent import ElasticNet
 from sklearn.linear_model._ridge import Ridge
 from sklearn.neighbors._regression import KNeighborsRegressor
@@ -61,7 +62,14 @@ def test_create_regression_model_minimal(sample_train_data):
     # Assert
     assert isinstance(
         model,
-        (ElasticNet, Ridge, KNeighborsRegressor, BaggingRegressor, AdaBoostRegressor),
+        (
+            ElasticNet,
+            Ridge,
+            KNeighborsRegressor,
+            BaggingRegressor,
+            AdaBoostRegressor,
+            StackingRegressor,
+        ),
     )
     assert isinstance(exp, RegressionExperiment)
 
