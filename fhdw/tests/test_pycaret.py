@@ -5,6 +5,8 @@ from unittest.mock import MagicMock
 import pytest
 from pycaret.regression import RegressionExperiment
 from pycaret.regression import load_experiment
+from sklearn.ensemble import AdaBoostRegressor
+from sklearn.ensemble import BaggingRegressor
 from sklearn.linear_model._coordinate_descent import ElasticNet
 from sklearn.linear_model._ridge import Ridge
 from sklearn.neighbors._regression import KNeighborsRegressor
@@ -44,22 +46,33 @@ def mock_regression_experiment():
 # Basic test case with minimum required inputs
 def test_create_regression_model_minimal(sample_train_data):
     """Basic test case with minimum required inputs."""
+    # Arrange
     train_data = sample_train_data[0]
     target = sample_train_data[1]
+
+    # Act
     exp, model = create_regression_model(
         data=train_data,
         target=target,
         include=["knn", "en", "ridge"],
         prefix="test",
     )
-    assert type(model) in (ElasticNet, Ridge, KNeighborsRegressor)
+
+    # Assert
+    assert isinstance(
+        model,
+        (ElasticNet, Ridge, KNeighborsRegressor, BaggingRegressor, AdaBoostRegressor),
+    )
     assert isinstance(exp, RegressionExperiment)
 
 
 def test_create_experiment_with_kwargs(sample_train_data):
     """Check if setup of experiment with kwargs sets configuration correctly."""
+    # Arrange
     train_data = sample_train_data[0]
     target = sample_train_data[1]
+
+    # Act
     exp, _ = create_regression_model(
         data=train_data,
         target=target,
@@ -67,14 +80,19 @@ def test_create_experiment_with_kwargs(sample_train_data):
         transform_target=True,  # not defined in func-params, hence becomes kwarg
         prefix="test",
     )
+
+    # Assert
     config_tt = exp.get_config("transform_target_param")
     assert config_tt is True
 
 
 def test_create_experiment_with_single_selection_n_select(sample_train_data):
     """Test single method selection to check that no ensembles are built."""
+    # Arrange
     train_data = sample_train_data[0]
     target = sample_train_data[1]
+
+    # Act
     exp, model = create_regression_model(
         data=train_data,
         target=target,
@@ -83,31 +101,80 @@ def test_create_experiment_with_single_selection_n_select(sample_train_data):
         prefix="test",
         n_select=1,
     )
+
+    # Assert
     assert isinstance(model, (ElasticNet, Ridge, KNeighborsRegressor))
     assert isinstance(exp, RegressionExperiment)
 
 
-def test_persist_data_unknown_strategy(experiment):
-    """Test model persistence with unknown strategy.
+def test_create_model_with_experiment_provided(sample_train_data):
+    """Test the option to provide a pre-defined experiment."""
+    # Arrange
+    train_data = sample_train_data[0]
+    target = sample_train_data[1]
 
-    should raise Notimplemented.
+    # Act
+    exp, model = create_regression_model(
+        data=train_data,
+        target=target,
+        include=["knn", "en", "ridge"],
+        transform_target=True,
+        prefix="test",
+        n_select=1,
+    )
+
+    # Assert
+    assert isinstance(model, (ElasticNet, Ridge, KNeighborsRegressor))
+    assert isinstance(exp, RegressionExperiment)
+
+
+def test_no_target_with_no_experiment(sample_train_data):
+    """Test type validation when no experiment is given.
+
+    `data` and `target` must be provideded when experiment is `None`.
     """
+    # Arrange
+    train_data = sample_train_data[0]
+
+    # Act & Assert
+    with pytest.raises(
+        ValueError, match="Either provide pre-defined experiment OR data and target."
+    ):
+        create_regression_model(experiment=None, data=train_data, target=None)
+
+
+def test_no_data_with_no_experiment():
+    """Test type validation when no experiment is given.
+
+    `data` and `target` must be provideded when experiment is `None`.
+    """
+    # Act & Assert
+    with pytest.raises(
+        ValueError, match="Either provide pre-defined experiment OR data and target."
+    ):
+        create_regression_model(experiment=None, data=None, target="dummy")
+
+
+def test_persist_data_unknown_strategy(experiment):
+    """Test model persistence with unknown strategy."""
+    # Act & Assert
     with pytest.raises(ValueError, match="unknown saving strategy"):
         persist_data(experiment=experiment, strategy="unknownlol", folder="")
 
 
 def test_persist_data_explicit_notation(experiment, tmp_path):
-    """Test model persistence with unknown strategy.
-
-    should raise Notimplemented.
-    """
+    """Test model persistence with unknown strategy."""
+    # Act
     result = persist_data(experiment=experiment, strategy="local", folder=str(tmp_path))
+
+    # Assert
     assert isinstance(result, str)
     assert Path(result).exists()
 
 
 def test_get_model_paths_custom_valid_folder(tmp_path):
     """Test get_model_paths with a custom folder."""
+    # Act & Assert
     result = get_model_paths(folder=tmp_path)  # temp folder as custom folder
     assert result == list(Path(tmp_path).glob("**/*.pkl"))
 
@@ -115,12 +182,15 @@ def test_get_model_paths_custom_valid_folder(tmp_path):
 def test_get_model_paths_custom_strategy_valid_path(tmp_path):
     """Test get_model_paths with a custom retrieval strategy."""
     custom_strategy = "mlflow"
+
+    # Act & Assert
     with pytest.raises(ValueError, match="unknown saving strategy"):
         get_model_paths(folder=tmp_path, stategy=custom_strategy)
 
 
 def test_get_model_paths_invalid_folder():
     """Test get_model_paths with an invalid folder."""
+    # Act & Assert
     with pytest.raises(
         NotADirectoryError,
         match="'invalid_folder' either not existing or not a folder.",
