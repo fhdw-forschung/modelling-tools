@@ -17,6 +17,7 @@ def create_regression_model(
     save_strategy: str | None = None,
     verbose: bool = False,
     log_experiment: bool = False,
+    n_select: int = 3,
     **kwargs,
 ):
     """Create a regression model with Pycaret.
@@ -59,6 +60,8 @@ def create_regression_model(
 
         save_strategy (str, optional): The strategy for saving artifacts. When "local",
         save in local `artifacts` folder. Defaults to `None`, i.e. save nothing.
+        This does not affect tracking with `mlflow`, incl. model logging through an
+        artifact store. This depends on `log_experiment` option.
 
         verbose (bool, optional): Whether to print training output. This affects all
         training steps.
@@ -66,13 +69,22 @@ def create_regression_model(
         log_experiment (bool, optional): Whether to log via MLFlow. Activates logs for
         experiment, data and plots.
 
+        n_select (int, optional): Numer of methods to be selected from the method
+        comparison. Selected methods will be incorporated in ensembles. Higher numbers
+        increase the runtime of the function significantly! When `n_select=1`, no
+        ensembles are built and evaluated.
+
     Returns:
         The `RegressionExperiment` and the tuned Pipeline containing the model.
     """
+    min_sel = 1  # at least select one method
+
     if exclude and include:
         raise ValueError("Cannot use both 'include' and 'exclude'.")
-    if include and len(include) < 3:
-        raise ValueError("When using include, provide at least three choices.")
+    if n_select < min_sel:
+        raise ValueError(f"`n_select` too low, must be at least {min_sel}.")
+    if include and len(include) < n_select:
+        raise ValueError("When using include, provide at least `n_select` choices.")
 
     exp_name = make_experiment_name(target=target, prefix=prefix)
     print(f"experiment name: '{exp_name}'")
@@ -92,25 +104,37 @@ def create_regression_model(
 
     # model tuning with best method
     best_methods = exp.compare_models(
-        exclude=exclude, include=include, sort=sort_metric, n_select=3, verbose=verbose
+        exclude=exclude,
+        include=include,
+        sort=sort_metric,
+        n_select=n_select,
+        verbose=verbose,
     )
-    reg = exp.create_model(best_methods[0], verbose=verbose)
+
+    # take into account that best_methods is not a list if `n_select=1`
+    best = best_methods[0] if n_select > min_sel else best_methods
+
+    reg = exp.create_model(best, verbose=verbose)
     tuned = exp.tune_model(reg, choose_better=True, verbose=verbose)
 
-    # ensemble best methods, after creating the initial model
-    exp.ensemble_model(
-        estimator=tuned, choose_better=True, method="Bagging", verbose=verbose
-    )
-    try:
+    if n_select > min_sel:
+        # ensemble best methods, after creating the initial model
         exp.ensemble_model(
-            estimator=tuned, choose_better=True, method="Boosting", verbose=verbose
+            estimator=tuned, choose_better=True, method="Bagging", verbose=verbose
         )
-    except TypeError:
-        print(f"Skipped boosting ensemble. Estimator {tuned} not supported.")
+        try:
+            exp.ensemble_model(
+                estimator=tuned, choose_better=True, method="Boosting", verbose=verbose
+            )
+        except TypeError:
+            print(f"Skipped boosting ensemble. Estimator {tuned} not supported.")
 
-    exp.stack_models(
-        estimator_list=best_methods, choose_better=True, restack=False, verbose=verbose
-    )
+        exp.stack_models(
+            estimator_list=best_methods,
+            choose_better=True,
+            restack=False,
+            verbose=verbose,
+        )
 
     best_model = exp.automl(optimize=sort_metric)
 

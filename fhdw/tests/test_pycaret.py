@@ -5,6 +5,9 @@ from unittest.mock import MagicMock
 import pytest
 from pycaret.regression import RegressionExperiment
 from pycaret.regression import load_experiment
+from sklearn.linear_model._coordinate_descent import ElasticNet
+from sklearn.linear_model._ridge import Ridge
+from sklearn.neighbors._regression import KNeighborsRegressor
 
 from fhdw.modelling.pycaret import create_regression_model
 from fhdw.modelling.pycaret import get_model_paths
@@ -49,8 +52,7 @@ def test_create_regression_model_minimal(sample_train_data):
         include=["knn", "en", "ridge"],
         prefix="test",
     )
-    print(type(model))
-
+    assert type(model) in (ElasticNet, Ridge, KNeighborsRegressor)
     assert isinstance(exp, RegressionExperiment)
 
 
@@ -62,11 +64,27 @@ def test_create_experiment_with_kwargs(sample_train_data):
         data=train_data,
         target=target,
         include=["knn", "en", "ridge"],
-        transform_target=True,
+        transform_target=True,  # not defined in func-params, hence becomes kwarg
         prefix="test",
     )
     config_tt = exp.get_config("transform_target_param")
     assert config_tt is True
+
+
+def test_create_experiment_with_single_selection_n_select(sample_train_data):
+    """Test single method selection to check that no ensembles are built."""
+    train_data = sample_train_data[0]
+    target = sample_train_data[1]
+    exp, model = create_regression_model(
+        data=train_data,
+        target=target,
+        include=["knn", "en", "ridge"],
+        transform_target=True,
+        prefix="test",
+        n_select=1,
+    )
+    assert isinstance(model, (ElasticNet, Ridge, KNeighborsRegressor))
+    assert isinstance(exp, RegressionExperiment)
 
 
 def test_persist_data_unknown_strategy(experiment):
