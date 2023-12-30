@@ -2,6 +2,23 @@
 
 import pandas as pd
 import plotly.express as px
+from sklearn.metrics import mean_absolute_error
+from sklearn.metrics import mean_absolute_percentage_error
+from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_squared_log_error
+from sklearn.metrics import r2_score
+
+
+def get_regression_metrics(y_true, y_pred):
+    """Get dictionary of common regression metrics."""
+    metrics = {
+        "MAE": mean_absolute_error(y_true=y_true, y_pred=y_pred),
+        "MAPE": mean_absolute_percentage_error(y_true=y_true, y_pred=y_pred),
+        "RMSE": mean_squared_error(y_true=y_true, y_pred=y_pred, squared=False),
+        "RMSLE": mean_squared_log_error(y_true=y_true, y_pred=y_pred, squared=False),
+        "R2": r2_score(y_true=y_true, y_pred=y_pred),
+    }
+    return metrics
 
 
 def plot_estimates_model_vs_actual(y_true, y_pred, target: str):
