@@ -8,8 +8,9 @@ from fhdw.modelling.base import make_experiment_name
 
 
 def create_regression_model(
-    data: DataFrame,
-    target: str,
+    experiment: RegressionExperiment | None = None,
+    data: DataFrame | None = None,
+    target: str | None = None,
     exclude: list | None = None,
     include: list | None = None,
     sort_metric: str = "RMSE",
@@ -86,21 +87,24 @@ def create_regression_model(
     if include and len(include) < n_select:
         raise ValueError("When using include, provide at least `n_select` choices.")
 
-    exp_name = make_experiment_name(target=target, prefix=prefix)
-    print(f"experiment name: '{exp_name}'")
-
-    # experiment setup
-    exp = RegressionExperiment()
-    exp.setup(
-        data=data,
-        target=target,
-        experiment_name=exp_name,
-        verbose=verbose,
-        log_experiment=log_experiment,
-        log_data=log_experiment,
-        log_plots=log_experiment,
-        **kwargs,
-    )
+    if isinstance(experiment, RegressionExperiment):
+        exp = experiment
+    elif experiment is None and isinstance(target, str) and isinstance(data, DataFrame):
+        exp_name = make_experiment_name(target=target, prefix=prefix)
+        print(f"experiment name: '{exp_name}'")
+        exp = RegressionExperiment()
+        exp.setup(
+            data=data,
+            target=target,
+            experiment_name=exp_name,
+            verbose=verbose,
+            log_experiment=log_experiment,
+            log_data=log_experiment,
+            log_plots=log_experiment,
+            **kwargs,
+        )
+    else:
+        raise ValueError("Either provide pre-defined experiment OR data and target.")
 
     # model tuning with best method
     best_methods = exp.compare_models(
