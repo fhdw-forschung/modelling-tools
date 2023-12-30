@@ -35,7 +35,7 @@ def make_experiment_name(target: str, prefix: str = "", sep: str = "-"):
         sep (str, optional): An optional seperator, placed between prefix and name.
 
     Returns:
-    - str: A formatted experiment name in the pattern '{prefix}{cleaned_target}'.
+    - str: A formatted experiment name in the pattern '[{prefix}{sep}]{cleaned_target}'.
     """
     clean_target_name = clean_string(target)
     clean_prefix_name = clean_string(prefix)
