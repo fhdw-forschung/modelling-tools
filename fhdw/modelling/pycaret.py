@@ -136,23 +136,23 @@ def create_regression_model(
     best = best_methods[0] if n_select > min_sel else best_methods
 
     reg = exp.create_model(best, verbose=verbose)
-    tuned = exp.tune_model(reg, choose_better=True, verbose=verbose)
+    tuned = exp.tune_model(reg, choose_better=False, verbose=verbose)
 
     if n_select > min_sel:
         # ensemble best methods, after creating the initial model
         exp.ensemble_model(
-            estimator=tuned, choose_better=True, method="Bagging", verbose=verbose
+            estimator=tuned, choose_better=False, method="Bagging", verbose=verbose
         )
         try:
             exp.ensemble_model(
-                estimator=tuned, choose_better=True, method="Boosting", verbose=verbose
+                estimator=tuned, choose_better=False, method="Boosting", verbose=verbose
             )
         except TypeError:
             print(f"Skipped boosting ensemble. Estimator {tuned} not supported.")
 
         exp.stack_models(
             estimator_list=best_methods,
-            choose_better=True,
+            choose_better=False,
             restack=False,
             verbose=verbose,
         )
