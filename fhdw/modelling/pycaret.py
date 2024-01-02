@@ -135,8 +135,9 @@ def create_regression_model(
     # take into account that best_methods is not a list if `n_select=1`
     best = best_methods[0] if n_select > min_sel else best_methods
 
-    reg = exp.create_model(best, verbose=verbose)
-    tuned = exp.tune_model(reg, choose_better=False, verbose=verbose)
+    tuned = exp.tune_model(
+        best, choose_better=True, optimize=sort_metric, verbose=verbose
+    )
 
     if n_select > min_sel:
         # ensemble best methods, after creating the initial model
