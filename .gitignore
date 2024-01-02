@@ -165,6 +165,7 @@ models/*
 experiments/*
 artifacts/*
 mlruns/*
+catboost_info/*
 
 # vscode
 .vscode/settings.json
