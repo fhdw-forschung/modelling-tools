@@ -6,6 +6,22 @@ from pycaret.regression import RegressionExperiment
 
 from fhdw.modelling.base import make_experiment_name
 
+PLOTS = {
+    "pipeline": "Schematic drawing of the preprocessing pipeline",
+    # "residuals_interactive": "Interactive Residual plots",
+    "residuals": "Residuals Plot",
+    "error": "Prediction Error Plot",
+    # "cooks": "Cooks Distance Plot",
+    # "rfe": "Recursive Feat. Selection",
+    # "learning": "Learning Curve",
+    # "vc": "Validation Curve",
+    # "manifold": "Manifold Learning",
+    "feature": "Feature Importance",
+    # "feature_all": "Feature Importance (All)",
+    # "parameter": "Model Hyperparameter",
+    # "tree": "Decision Tree",
+}
+
 
 def create_regression_model(
     experiment: RegressionExperiment | None = None,
@@ -91,6 +107,7 @@ def create_regression_model(
         exp = experiment
     elif experiment is None and isinstance(target, str) and isinstance(data, DataFrame):
         exp_name = make_experiment_name(target=target, prefix=prefix)
+        log_plots = list(PLOTS.keys()) if log_experiment else log_experiment
         print(f"experiment name: '{exp_name}'")
         exp = RegressionExperiment()
         exp.setup(
@@ -100,7 +117,7 @@ def create_regression_model(
             verbose=verbose,
             log_experiment=log_experiment,
             log_data=log_experiment,
-            log_plots=log_experiment,
+            log_plots=log_plots,
             **kwargs,
         )
     else:
