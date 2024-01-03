@@ -17,6 +17,8 @@ from fhdw.modelling.pycaret import get_model_paths
 from fhdw.modelling.pycaret import persist_data
 from fhdw.modelling.pycaret import persist_experiment
 
+RANDOMIZED_SEARCH_ITERATIONS = 2
+
 
 @pytest.fixture(scope="session", name="experiment")
 def dummy_experiment(sample_train_data):
@@ -57,6 +59,7 @@ def test_create_regression_model_minimal(sample_train_data):
         target=target,
         include=["knn", "en", "ridge"],
         prefix="test",
+        n_iter=RANDOMIZED_SEARCH_ITERATIONS,
     )
 
     # Assert
@@ -87,6 +90,7 @@ def test_create_experiment_with_kwargs(sample_train_data):
         include=["knn", "en", "ridge"],
         transform_target=True,  # not defined in func-params, hence becomes kwarg
         prefix="test",
+        n_iter=RANDOMIZED_SEARCH_ITERATIONS,
     )
 
     # Assert
@@ -108,6 +112,7 @@ def test_create_experiment_with_single_selection_n_select(sample_train_data):
         transform_target=True,
         prefix="test",
         n_select=1,
+        n_iter=RANDOMIZED_SEARCH_ITERATIONS,
     )
 
     # Assert
@@ -129,6 +134,7 @@ def test_create_model_with_experiment_provided(sample_train_data):
         transform_target=True,
         prefix="test",
         n_select=1,
+        n_iter=RANDOMIZED_SEARCH_ITERATIONS,
     )
 
     # Assert

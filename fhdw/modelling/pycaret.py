@@ -35,6 +35,7 @@ def create_regression_model(
     verbose: bool = False,
     log_experiment: bool = False,
     n_select: int = 3,
+    n_iter: int = 25,
     **kwargs,
 ):
     """Create a regression model with Pycaret.
@@ -91,6 +92,11 @@ def create_regression_model(
         increase the runtime of the function significantly! When `n_select=1`, no
         ensembles are built and evaluated.
 
+        n_iter (int): Number of parameter settings that are sampled. `n_iter` trades
+        off runtime vs quality of the solution. In PyCaret tuning is implemented through
+        `sklearn.model_selection.RandomizedSearchCV`.
+        See scikit-learn documentation for details.
+
     Returns:
         The `RegressionExperiment` and the tuned Pipeline containing the model.
     """
@@ -136,7 +142,7 @@ def create_regression_model(
     best = best_methods[0] if n_select > min_sel else best_methods
 
     tuned = exp.tune_model(
-        best, choose_better=True, optimize=sort_metric, verbose=verbose
+        best, choose_better=True, optimize=sort_metric, n_iter=n_iter, verbose=verbose
     )
 
     if n_select > min_sel:
