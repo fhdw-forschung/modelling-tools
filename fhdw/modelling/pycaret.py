@@ -114,7 +114,8 @@ def create_regression_model(
     elif experiment is None and isinstance(target, str) and isinstance(data, DataFrame):
         exp_name = make_experiment_name(target=target, prefix=prefix)
         log_plots = list(PLOTS.keys()) if log_experiment else log_experiment
-        print(f"experiment name: '{exp_name}'")
+        if verbose:
+            print(f"experiment name: '{exp_name}'")
         exp = RegressionExperiment()
         exp.setup(
             data=data,
