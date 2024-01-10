@@ -119,7 +119,7 @@ def create_regression_model(
 
     verbose_pycaret = verbose == 2  # pycaret expects boolean; highest verbosity
 
-    if isinstance(experiment, RegressionExperiment):
+    if isinstance(experiment, RegressionExperiment) and data is None and target is None:
         exp = experiment
     elif experiment is None and isinstance(target, str) and isinstance(data, DataFrame):
         exp_name = make_experiment_name(target=target, prefix=prefix)
