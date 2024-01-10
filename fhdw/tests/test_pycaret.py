@@ -111,7 +111,6 @@ def test_create_experiment_with_single_selection_n_select(sample_train_data):
         data=train_data,
         target=target,
         include=["knn", "en", "ridge"],
-        transform_target=True,
         prefix="test",
         n_select=1,
         n_iter=RANDOMIZED_SEARCH_ITERATIONS,
@@ -122,26 +121,105 @@ def test_create_experiment_with_single_selection_n_select(sample_train_data):
     assert isinstance(exp, RegressionExperiment)
 
 
-def test_create_model_with_experiment_provided(sample_train_data):
+def test_create_model_with_experiment_provided(mock_experiment):
     """Test the option to provide a pre-defined experiment."""
+    # Act
+    exp, _ = create_regression_model(
+        experiment=mock_experiment,
+        include=["knn", "en", "ridge"],
+        prefix="test",
+        n_iter=RANDOMIZED_SEARCH_ITERATIONS,
+    )
+
+    # Assert
+    assert isinstance(exp, RegressionExperiment)
+
+
+def test_create_model_with_experiment_and_data(sample_train_data, mock_experiment):
+    """Test the option to provide a pre-defined experiment.
+
+    Data should not be defined when experiment is given.
+    """
+    # Arrange
+    train_data = sample_train_data[0]
+
+    # Act and Assert
+    with pytest.raises(
+        ValueError, match="Either provide pre-defined experiment OR data and target."
+    ):
+        _, _ = create_regression_model(
+            experiment=mock_experiment,
+            data=train_data,
+            include=["knn", "en", "ridge"],
+            prefix="test",
+            n_iter=RANDOMIZED_SEARCH_ITERATIONS,
+        )
+
+
+def test_create_model_with_experiment_and_target(mock_experiment):
+    """Test the option to provide a pre-defined experiment.
+
+    Target should not be defined when experiment is given.
+    """
+    # Act and Assert
+    with pytest.raises(
+        ValueError, match="Either provide pre-defined experiment OR data and target."
+    ):
+        _, _ = create_regression_model(
+            experiment=mock_experiment,
+            target="ANYTARGET",  # should not be defined here when experiment is given
+            include=["knn", "en", "ridge"],
+            prefix="test",
+            n_iter=RANDOMIZED_SEARCH_ITERATIONS,
+        )
+
+
+def test_create_model_with_experiment_and_data_and_target(
+    sample_train_data, mock_experiment
+):
+    """Test the option to provide a pre-defined experiment.
+
+    Data and Target should not be defined when experiment is given.
+    """
     # Arrange
     train_data = sample_train_data[0]
     target = sample_train_data[1]
 
-    # Act
-    exp, model = create_regression_model(
-        data=train_data,
-        target=target,
-        include=["knn", "en", "ridge"],
-        transform_target=True,
-        prefix="test",
-        n_select=1,
-        n_iter=RANDOMIZED_SEARCH_ITERATIONS,
-    )
+    # Act and Assert
+    with pytest.raises(
+        ValueError, match="Either provide pre-defined experiment OR data and target."
+    ):
+        _, _ = create_regression_model(
+            experiment=mock_experiment,
+            data=train_data,
+            target=target,
+            include=["knn", "en", "ridge"],
+            prefix="test",
+            n_iter=RANDOMIZED_SEARCH_ITERATIONS,
+        )
 
-    # Assert
-    assert isinstance(model, (ElasticNet, Ridge, KNeighborsRegressor))
-    assert isinstance(exp, RegressionExperiment)
+
+def test_verbosity_level(mock_experiment, capfd):
+    """Test the option to provide a pre-defined experiment.
+
+    Target should not be defined when experiment is given.
+    """
+    # Act and Assert
+    _, _ = create_regression_model(
+        experiment=mock_experiment,
+        include=["knn", "en", "ridge"],
+        prefix="test",
+        n_iter=RANDOMIZED_SEARCH_ITERATIONS,
+        verbose=1,
+    )
+    out, _ = capfd.readouterr()
+
+    assert "compare models..." in out
+    assert "tune model..." in out
+    assert "ensemble model (Bagging)..." in out
+    assert "ensemble model (Boosting)..." in out
+    assert "stack models..." in out
+    assert "blend models (Voting)..." in out
 
 
 def test_no_target_with_no_experiment(sample_train_data):

@@ -32,7 +32,7 @@ def create_regression_model(
     sort_metric: str = "RMSE",
     prefix: str = "",
     save_strategy: str | None = None,
-    verbose: bool = False,
+    verbose: int = 0,
     log_experiment: bool = False,
     n_select: int = 3,
     n_iter: int = 25,
@@ -85,8 +85,9 @@ def create_regression_model(
         This does not affect tracking with `mlflow`, incl. model logging through an
         artifact store. This depends on `log_experiment` option.
 
-        verbose (bool, optional): Whether to print training output. This affects all
-        training steps.
+        verbose (int, optional): Whether to print training output. This affects all
+        training steps. Values in [0, 1, 2], where 0 is non-verbous, 1 is minimal
+        information and 2 prints the full pipeline information.
 
         log_experiment (bool, optional): Whether to log via MLflow. Activates logs for
         experiment, data and plots.
@@ -105,6 +106,7 @@ def create_regression_model(
         The `RegressionExperiment` and the tuned Pipeline containing the model.
     """
     min_sel = 1  # at least select one method
+    verb_levels = [0, 1, 2]
 
     if exclude and include:
         raise ValueError("Cannot use both 'include' and 'exclude'.")
@@ -112,20 +114,25 @@ def create_regression_model(
         raise ValueError(f"`n_select` too low, must be at least {min_sel}.")
     if include and len(include) < n_select:
         raise ValueError("When using include, provide at least `n_select` choices.")
+    if verbose not in verb_levels:
+        raise ValueError(f"verbose must have levels in '{verb_levels}'")
 
-    if isinstance(experiment, RegressionExperiment):
+    verbose_pycaret = verbose == 2  # pycaret expects boolean; highest verbosity
+
+    if isinstance(experiment, RegressionExperiment) and data is None and target is None:
         exp = experiment
     elif experiment is None and isinstance(target, str) and isinstance(data, DataFrame):
         exp_name = make_experiment_name(target=target, prefix=prefix)
         log_plots = list(PLOTS.keys()) if log_experiment else log_experiment
         if verbose:
             print(f"experiment name: '{exp_name}'")
+        _print_info("experiment setup...", level=verbose)
         exp = RegressionExperiment()
         exp.setup(
             data=data,
             target=target,
             experiment_name=exp_name,
-            verbose=verbose,
+            verbose=verbose_pycaret,
             log_experiment=log_experiment,
             log_data=log_experiment,
             log_plots=log_plots,
@@ -134,46 +141,61 @@ def create_regression_model(
     else:
         raise ValueError("Either provide pre-defined experiment OR data and target.")
 
-    # model tuning with best method
+    _print_info("compare models...", level=verbose)
+
     best_methods = exp.compare_models(
         exclude=exclude,
         include=include,
         sort=sort_metric,
         n_select=n_select,
-        verbose=verbose,
+        verbose=verbose_pycaret,
     )
 
     # take into account that best_methods is not a list if `n_select=1`
     best = best_methods[0] if n_select > min_sel else best_methods
 
+    _print_info("tune model...", level=verbose)
     tuned = exp.tune_model(
-        best, choose_better=True, optimize=sort_metric, n_iter=n_iter, verbose=verbose
+        estimator=best,
+        choose_better=True,
+        optimize=sort_metric,
+        n_iter=n_iter,
+        verbose=verbose_pycaret,
     )
 
     if n_select > min_sel:
-        # ensemble best methods, after creating the initial model
+        _print_info("ensemble model (Bagging)...", level=verbose)
         exp.ensemble_model(
-            estimator=tuned, choose_better=False, method="Bagging", verbose=verbose
+            estimator=tuned,
+            choose_better=False,
+            method="Bagging",
+            verbose=verbose_pycaret,
         )
         try:
+            _print_info("ensemble model (Boosting)...", level=verbose)
             exp.ensemble_model(
-                estimator=tuned, choose_better=False, method="Boosting", verbose=verbose
+                estimator=tuned,
+                choose_better=False,
+                method="Boosting",
+                verbose=verbose_pycaret,
             )
         except TypeError:
-            print(f"Skipped boosting ensemble. Estimator {tuned} not supported.")
+            print(f"Skipped ensemble with Boosting. Estimator {tuned} not supported.")
 
+        _print_info("stack models...", level=verbose)
         exp.stack_models(
             estimator_list=best_methods,
             choose_better=False,
             restack=False,
-            verbose=verbose,
+            verbose=verbose_pycaret,
         )
 
+        _print_info("blend models (Voting)...", level=verbose)
         exp.blend_models(
             estimator_list=best_methods,
             choose_better=False,
             optimize=sort_metric,
-            verbose=verbose,
+            verbose=verbose_pycaret,
         )
 
     best_model = exp.automl(optimize=sort_metric)
@@ -348,3 +370,9 @@ def persist_experiment(
         return path_exp
 
     raise ValueError("unknown saving strategy")
+
+
+def _print_info(text: str, level):
+    """Print depending on the verbosity level."""
+    if level == 1:  # verbosity 2 not considered, pycaret does this
+        print(text)
