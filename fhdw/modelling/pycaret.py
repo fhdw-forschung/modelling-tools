@@ -52,13 +52,17 @@ def create_regression_model(
     - create and tune a model with the best method incl. cross validation (`tune_model`)
     - create a (single-method) model with standard hyperparameters cross validation
     (`create_model`) with the best performing ML-method from previous `compare_models`
-    - create an ensemble with this single-method model with bagging procedure
-    - create an ensemble with this single-method model with boosting procedure
+    - create an ensemble with this single-method model (bagging procedure);
+    samples a new dataset from the train data with replacement per model
+    - create an ensemble with this single-method model (boosting procedure);
+    Boosting is implemented through `sklearn.ensemble.AdaBoostRegressor`
     - create a stacked estimator comprised of the three best methods from comparison;
     the meta-learner is `LinearRegression`
+    - create a voting regressor comprised of the three best methods from comparison;
+    trains on the whole dataset
 
-    - artifacts and input of the process will be saved (optionally) to the `artifacts`
-    folder which will be created if not existing.
+    - artifacts and input of the process will be saved (optionally, `save_strategy`) to
+    the `artifacts` folder which will be created if not existing.
 
     Args:
         train_data: The training data.
@@ -84,7 +88,7 @@ def create_regression_model(
         verbose (bool, optional): Whether to print training output. This affects all
         training steps.
 
-        log_experiment (bool, optional): Whether to log via MLFlow. Activates logs for
+        log_experiment (bool, optional): Whether to log via MLflow. Activates logs for
         experiment, data and plots.
 
         n_select (int, optional): Numer of methods to be selected from the method
@@ -162,6 +166,13 @@ def create_regression_model(
             estimator_list=best_methods,
             choose_better=False,
             restack=False,
+            verbose=verbose,
+        )
+
+        exp.blend_models(
+            estimator_list=best_methods,
+            choose_better=False,
+            optimize=sort_metric,
             verbose=verbose,
         )
 
@@ -273,7 +284,7 @@ def get_model_paths(folder: str = "artifacts/models", stategy: str = "local"):
         "pkl".
 
         strategy (str, optional): Retrieval strategy. Currently, only "local" strategy
-        is supported. Other strategies like MLFlow might be supported in the future.
+        is supported. Other strategies like MLflow might be supported in the future.
 
     Returns:
         List[Path]: A list of Path objects representing the model files in the specified
