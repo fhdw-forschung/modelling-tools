@@ -1,0 +1,11 @@
+# Table of contents
+# Learn more at https://jupyterbook.org/customize/toc.html
+
+# documentation on 'Structure the Table of Contents' (https://jupyterbook.org/en/stable/structure/sections-headers.html#)
+# documentation on 'How headers and sections map onto to book structure' (https://jupyterbook.org/en/stable/structure/sections-headers.html#)
+
+format: jb-book
+root: README
+
+chapters:
+  - file: api

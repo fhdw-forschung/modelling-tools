@@ -22,6 +22,8 @@ pycaret = { version = "^3.2.0", extras = ["mlops"] }
 pyarrow = "^14.0.1"
 fastapi = "^0.104.1"
 pyyaml = "^6.0.1"
+jupyter-book = "^0.15.1"
+sphinx-autobuild = "^2021.3.14"
 
 [tool.poetry.group.dev.dependencies]
 bandit = "^1.7.5"

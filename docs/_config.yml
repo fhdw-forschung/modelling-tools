@@ -1,0 +1,48 @@
+# Learn more at https://jupyterbook.org/customize/config.html
+
+#######################################################################################
+# Book settings
+title: Modelling Tools Documentation & Examples
+author: FHDW
+# logo: logo-bebefam.png
+only_build_toc_files: true
+
+#######################################################################################
+# Execution settings
+# See https://jupyterbook.org/content/execute.html
+execute:
+  execute_notebooks: off # Whether to execute notebooks at build time. Must be one of ("auto", "force", "cache", "off")
+
+# Define the name of the latex output file for PDF builds
+latex:
+  latex_documents:
+    targetname: book.tex
+
+# Add a bibtex file so that we can create citations
+# bibtex_bibfiles:
+#   - references.bib
+
+# Information about where the book exists on the web
+repository:
+  url: https://github.com/fhdw-forschung/modelling-tools # Online location of your book
+  path_to_book: docs # Optional path to your book, relative to the repository root
+  branch: main # Which branch of the repository should be used when creating links (optional)
+
+#######################################################################################
+# HTML-specific settings
+html:
+  use_issues_button: true # Whether to add an "open an issue" button
+  use_repository_button: true # Whether to add a link to your repository button
+
+#######################################################################################
+# Advanced and power-user settings
+sphinx:
+  config: # key-value pairs to directly over-ride the Sphinx configuration
+    nb_merge_streams: true
+    add_module_names: False
+    html_js_files:
+      - https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js
+  extra_extensions:
+    - "sphinx.ext.autodoc"
+    - "sphinx.ext.napoleon"
+    - "sphinx.ext.viewcode"
