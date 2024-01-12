@@ -19,6 +19,8 @@ This is a collection of modelling tools. It is intended as a project-independent
 
 # Documentation material
 
+Visit the [documentation](https://fhdw-forschung.github.io/modelling-tools/).
+
 There is material for documenation and presentation of research results. 
 It is is set up using [Jupyter Book](https://jupyterbook.org/en/stable/intro.html).
 

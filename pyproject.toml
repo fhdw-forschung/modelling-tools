@@ -11,6 +11,7 @@ license = "MPL-2.0"
 readme = "README.md"
 repository = "https://github.com/fhdw-forschung/modelling-tools"
 packages = [{ include = "fhdw" }]
+documentation = "https://fhdw-forschung.github.io/modelling-tools/"
 
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/fhdw-forschung/modelling-tools/issues"
