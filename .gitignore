@@ -170,3 +170,6 @@ catboost_info/*
 # vscode
 .vscode/settings.json
 devcontainer.env
+
+# conf.py should be converted from Jupyter Book
+docs/conf.py
