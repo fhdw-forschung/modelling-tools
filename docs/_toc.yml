@@ -7,5 +7,10 @@
 format: jb-book
 root: README
 
-chapters:
-  - file: api
+parts:
+  - caption: Examples
+    chapters:
+      - file: test-functions.ipynb
+  - caption: Documentation
+    chapters:
+      - file: api

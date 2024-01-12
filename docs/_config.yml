@@ -2,7 +2,7 @@
 
 #######################################################################################
 # Book settings
-title: Modelling Tools Documentation & Examples
+title: FHDW Modelling Tools Examples & Documentation
 author: FHDW
 # logo: logo-bebefam.png
 only_build_toc_files: true
