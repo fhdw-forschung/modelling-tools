@@ -34,7 +34,7 @@ First of all, it would be best to familiarize with the [official Jupyter Book do
 
 Manually generate files:
 ```sh
-jb build --all --builder html docs
+poetry run jb build --all --builder html docs
 ```
 ```{note}
 When using devcontainers for development (recommended), the generated files are not directly accessible from your systems browser and have to be privided via a web server example. With `vscode` you could also use the preview functionality of the `"ms-vscode.live-server"` extension (already installed if you use the provided devcontainer configuration of this repo). Alternatively you could utilize Sphinx's autobuild extension described below.
@@ -42,7 +42,7 @@ When using devcontainers for development (recommended), the generated files are 
 
 Auto-generating the docs with a watchdog while developing can be done via the [`sphinx-autobuild` extension (click for details)](https://github.com/executablebooks/sphinx-autobuild). Before running `sphinx-autobuild`, convert the Jupyter Book configuration with the following command (from root of repo):
 ```sh
-jupyter-book config sphinx docs/
+poetry run jupyter-book config sphinx docs/
 ```
 `> Wrote conf.py to /workspaces/bebefam-exploration/docs`
 
@@ -52,5 +52,5 @@ Do not tinker with the generated configuration (`conf.py`). All configuration is
 
 Then run the autobuild with:
 ```sh
-sphinx-autobuild -a --open-browser docs docs/_build/html
+poetry run sphinx-autobuild -a --open-browser docs docs/_build/html
 ```
