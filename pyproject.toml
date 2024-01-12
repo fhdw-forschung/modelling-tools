@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "fhdw-modelling"
-version = "4.3.0"
+version = "4.4.0"
 description = "A collection of modelling tools. Intended for generic usage in FHDW projects."
 authors = ["Pascal Niggemeier <pascal.niggemeier@fhdw.de>"]
 license = "MPL-2.0"
