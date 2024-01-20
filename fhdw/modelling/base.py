@@ -9,7 +9,7 @@ def clean_string(string: str):
     Special characters in the beginning and end of the string are dropped.
     Those inbetween are replaced with a hyphen ``-`` character.
 
-    Parameters:
+    Args:
         string (str): The input string to be cleaned.
 
     Returns:
@@ -27,7 +27,7 @@ def make_experiment_name(target: str, prefix: str = "", sep: str = "-"):
     Clean the target variable by removing special characters and converting it to
     lowercase using the ``clean_string`` function.
 
-    Parameters:
+    Args:
         target (str): The target variable for the experiment.
 
         prefix (str, optional): An optional prefix to be added to the experiment name.

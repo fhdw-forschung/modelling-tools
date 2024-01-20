@@ -27,7 +27,7 @@ def plot_estimates_model_vs_actual(y_true, y_pred, target: str):
     Estimates made by the model with `experiment.predict_model` are plotted alongside
     with the actual values.
 
-    Parameters:
+    Args:
         y_true: The actual values of the ground truth.
 
         y_pred: The inference values made by the model.

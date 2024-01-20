@@ -74,7 +74,7 @@ def create_regression_model(
         According to ``save_trategy``. Saves to the ``artifacts`` folder which will be
         created if not existing.
 
-    Parameters:
+    Args:
         train_data (pandas.DataFrame): The training data.
 
         target (str): The name of the target variable in the train data.
@@ -268,7 +268,7 @@ def persist_data(
 ):
     """Persists the dataset from a ``RegressionExperiment``.
 
-    Parameters:
+    Args:
         experiment (RegressionExperiment): The experiment containing the dataset.
 
         folder (str, optional): The folder path to save the dataset. Defaults to
@@ -311,7 +311,7 @@ def persist_experiment(
     Saves the experiment with all configuration. The data must be saved separately.
     You could use ``persist_data`` for this.
 
-    Parameters:
+    Args:
         experiment (RegressionExperiment): The experiment to be persisted.
 
         folder (str, optional): The folder path where the experiment will be saved.
@@ -356,7 +356,7 @@ def persist_model(
 ):
     """Persist the given model.
 
-    Parameters:
+    Args:
         experiment (RegressionExperiment): The regression experiment object.
 
         model: The trained model to be persisted.
