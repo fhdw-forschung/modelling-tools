@@ -46,64 +46,75 @@ def create_regression_model(
     This convenience functions performs several steps, which strive for the best model
     possible, with minimal configuration provided. Therefore the runtime can be quite
     long. The following pycaret mechanics are progressed (in this order):
-    - create regression experiment (`RegressionExperiment`)
-    - set up regression experiment (`setup`)
-    - get the three best performing ML-methods (`compare_models`)
-    - create and tune a model with the best method incl. cross validation (`tune_model`)
-    - create a (single-method) model with standard hyperparameters cross validation
-    (`create_model`) with the best performing ML-method from previous `compare_models`
-    - create an ensemble with this single-method model (bagging procedure);
-    samples a new dataset from the train data with replacement per model
-    - create an ensemble with this single-method model (boosting procedure);
-    Boosting is implemented through `sklearn.ensemble.AdaBoostRegressor`
-    - create a stacked estimator comprised of the three best methods from comparison;
-    the meta-learner is `LinearRegression`
-    - create a voting regressor comprised of the three best methods from comparison;
-    trains on the whole dataset
 
-    - artifacts and input of the process will be saved (optionally, `save_strategy`) to
-    the `artifacts` folder which will be created if not existing.
+    - Create regression experiment.
+        Uses ``RegressionExperiment``.
+    - Set up regression experiment
+        Uses ``setup``.
+    - Get the three best performing ML-methods.
+        Uses ``compare_models``.
+    - Create and tune a model with the best method incl. cross validation.
+        Uses ``tune_model``.
+    - Create a (single-method) model with standard hyperparameters cross validation.
+        Uses ``create_model`` with the best performing ML-method from previous
+        ``compare_models``.
+    - Create an ensemble with this single-method model.
+        *Bagging* procedure.
+        Samples a new dataset from the train data with replacement per model.
+    - Create an ensemble with this single-method model.
+        *Boosting* procedure, which is implemented through
+        ``sklearn.ensemble.AdaBoostRegressor``.
+    - Create a stacked estimator
+        Comprised of the three best methods from comparison.
+        The meta-learner is ``LinearRegression``.
+    - Create a voting regressor
+        Comprised of the three best methods from comparison.
+        Trains on the whole dataset.
+    - Save artifacts and Input of the process.
+        According to ``save_trategy``. Saves to the ``artifacts`` folder which will be
+        created if not existing.
 
-    Args:
-        train_data: The training data.
+    Parameters:
+        train_data (pandas.DataFrame): The training data.
 
-        target: The name of the target variable in the train data.
+        target (str): The name of the target variable in the train data.
 
         exclude_models (List[str]): A list of model names to exclude from comparison.
-        Cannot be used in conjunction with `include_models`.
+            Cannot be used in conjunction with ``include_models``.
 
         include_models (List[str]): A list of model names to include in comparison.
-        Cannot be used in conjunction with `exclude_models`.
+            Cannot be used in conjunction with ``exclude_models``.
 
         sort_metric (str): The metric used to sort the models.
 
         prefix: A Prefix that will be added to the experiment name. This may help to
-        further organize experiments.
+            further organize experiments.
 
-        save_strategy (str, optional): The strategy for saving artifacts. When "local",
-        save in local `artifacts` folder. Defaults to `None`, i.e. save nothing.
-        This does not affect tracking with `mlflow`, incl. model logging through an
-        artifact store. This depends on `log_experiment` option.
+        save_strategy (str, optional): The strategy for saving artifacts. When
+            ``"local"``, save in local ``artifacts`` folder. Defaults to ``None``,
+            i.e. save nothing. This does not affect tracking with ``mlflow``, incl.
+            model logging through an artifact store. This depends on ``log_experiment``
+            option.
 
         verbose (int, optional): Whether to print training output. This affects all
-        training steps. Values in [0, 1, 2], where 0 is non-verbous, 1 is minimal
-        information and 2 prints the full pipeline information.
+            training steps. Values in ``[0, 1, 2]``, where ``0`` is non-verbous, ``1``
+            is minimal information and ``2`` prints the full pipeline information.
 
         log_experiment (bool, optional): Whether to log via MLflow. Activates logs for
-        experiment, data and plots.
+            experiment, data and plots.
 
         n_select (int, optional): Numer of methods to be selected from the method
-        comparison. Selected methods will be incorporated in ensembles. Higher numbers
-        increase the runtime of the function significantly! When `n_select=1`, no
-        ensembles are built and evaluated.
+            comparison. Selected methods will be incorporated in ensembles. Higher
+            numbers increase the runtime of the function significantly! When
+            ``n_select=1``, no ensembles are built and evaluated.
 
-        n_iter (int): Number of parameter settings that are sampled. `n_iter` trades
-        off runtime vs quality of the solution. In PyCaret tuning is implemented through
-        `sklearn.model_selection.RandomizedSearchCV`.
-        See scikit-learn documentation for details.
+        n_iter (int): Number of parameter settings that are sampled. ``n_iter`` trades
+            off runtime vs quality of the solution. In PyCaret tuning is implemented
+            through ``sklearn.model_selection.RandomizedSearchCV``.
+            See scikit-learn documentation for details.
 
     Returns:
-        The `RegressionExperiment` and the tuned Pipeline containing the model.
+        tuple: The ``RegressionExperiment`` and the tuned Pipeline containing the model.
     """
     min_sel = 1  # at least select one method
     verb_levels = [0, 1, 2]
@@ -215,106 +226,29 @@ def create_regression_model(
     return exp, best_model
 
 
-def persist_data(
-    experiment: RegressionExperiment,
-    folder: str = "artifacts/data",
-    strategy: str = "local",
-):
-    """Persists the dataset from a RegressionExperiment.
-
-    Args:
-        experiment (RegressionExperiment): The experiment containing the dataset.
-
-        folder (str, optional): The folder path to save the dataset. Defaults to
-        "experiments/data". Folder will be created if not existing.
-
-        strategy (str, optional): The strategy for saving the dataset. Defaults to
-        "local".
-
-    Returns:
-        str: The path where the dataset is saved.
-
-    Raises:
-        ValueError: Raised when an unknown saving strategy is provided.
-
-    Example:
-        experiment = RegressionExperiment(...)
-        persist_data(experiment, folder="custom_folder", strategy="local")
-    """
-    data: DataFrame = experiment.dataset
-
-    if strategy == "local":
-        Path(folder).mkdir(parents=True, exist_ok=True)
-        path = f"{folder}/{experiment.exp_name_log}.parquet"
-        data.to_parquet(path)
-        return path
-
-    raise ValueError("unknown saving strategy")
-
-
-def persist_model(
-    experiment: RegressionExperiment,
-    model,
-    folder: str = "artifacts/models",
-    strategy: str = "local",
-):
-    """Persist the given model.
-
-    Args:
-        experiment (RegressionExperiment): The regression experiment object.
-
-        model: The trained model to be persisted.
-
-        folder (str, optional): The folder where the model will be saved.
-        Defaults to "models".
-
-        strategy (str, optional): The saving strategy.
-        Currently, only "local" strategy is supported. Defaults to "local".
-
-    Returns:
-        Path: The path where the model is saved.
-
-    Raises:
-        ValueError: If an unknown saving strategy is provided.
-
-    Note:
-        This function is a convenience wrapper around the `save_model` method
-        of the provided `experiment` object. It automatically manages the
-        boilerplate code for saving the model with the appropriate name derived
-        from the experiment.
-    """
-    if strategy == "local":
-        model_folder = Path(folder)
-        model_folder.mkdir(parents=True, exist_ok=True)
-        path_model = model_folder / Path(experiment.exp_name_log)
-        experiment.save_model(model=model, model_name=str(path_model))
-        return path_model
-
-    raise ValueError("unknown saving strategy")
-
-
 def get_model_paths(folder: str = "artifacts/models", stategy: str = "local"):
     """Retrieves a list of model files from the specified folder and subfolders.
 
-    Recursive `Path.glob`.
+    Recursive ``Path.glob``.
 
     Args:
         folder (str, optional): Path to the folder containing model files. Defaults
-        to "models". Folder will be created if not existing.
+            to ``"models"``. Folder will be created if not existing.
 
         file_extension (str, optional): File extension for model files. Defaults to
-        "pkl".
+            ``"pkl"``.
 
-        strategy (str, optional): Retrieval strategy. Currently, only "local" strategy
-        is supported. Other strategies like MLflow might be supported in the future.
+        strategy (str, optional): Retrieval strategy. Currently, only ``"local"``
+            strategy is supported. Other strategies like MLflow might be supported in
+            the future.
 
     Returns:
-        List[Path]: A list of Path objects representing the model files in the specified
-        folder.
+        List[Path]: A list of ``Path`` objects representing the model files in the
+        specified folder.
 
     Raises:
         NotADirectoryError: If the specified folder does not exist or is not a
-        directory.
+            directory.
 
         ValueError: If an unsupported retrieval strategy is specified.
     """
@@ -327,6 +261,46 @@ def get_model_paths(folder: str = "artifacts/models", stategy: str = "local"):
     raise ValueError("unknown saving strategy")
 
 
+def persist_data(
+    experiment: RegressionExperiment,
+    folder: str = "artifacts/data",
+    strategy: str = "local",
+):
+    """Persists the dataset from a ``RegressionExperiment``.
+
+    Parameters:
+        experiment (RegressionExperiment): The experiment containing the dataset.
+
+        folder (str, optional): The folder path to save the dataset. Defaults to
+            ``"experiments/data"``. Folder will be created if not existing.
+
+        strategy (str, optional): The strategy for saving the dataset. Defaults to
+            ``"local"``.
+
+    Returns:
+        str: The path where the dataset is saved.
+
+    Raises:
+        ValueError: Raised when an unknown saving strategy is provided.
+
+    Example:
+        ::
+
+            experiment = RegressionExperiment(...)
+            persist_data(experiment, folder="custom_folder", strategy="local")
+
+    """
+    data: DataFrame = experiment.dataset
+
+    if strategy == "local":
+        Path(folder).mkdir(parents=True, exist_ok=True)
+        path = f"{folder}/{experiment.exp_name_log}.parquet"
+        data.to_parquet(path)
+        return path
+
+    raise ValueError("unknown saving strategy")
+
+
 def persist_experiment(
     experiment: RegressionExperiment,
     folder: str = "artifacts/experiments",
@@ -335,16 +309,16 @@ def persist_experiment(
     """Persist the given experiment.
 
     Saves the experiment with all configuration. The data must be saved separately.
-    You could use `persist_data` for this.
+    You could use ``persist_data`` for this.
 
-    Args:
+    Parameters:
         experiment (RegressionExperiment): The experiment to be persisted.
 
         folder (str, optional): The folder path where the experiment will be saved.
-        Defaults to "experiments".
+            Defaults to ``"experiments"``.
 
-        strategy (str, optional): The saving strategy. Currently, only "local"
-        strategy is supported. Defaults to "local".
+        strategy (str, optional): The saving strategy. Currently, only ``"local"``
+            strategy is supported. Defaults to ``"local"``.
 
     Returns:
         str: The path where the experiment is saved.
@@ -353,14 +327,16 @@ def persist_experiment(
         ValueError: Raised when an unknown saving strategy is provided.
 
     Note:
-        This function is a convenience wrapper for `exp.save_experiment` to simplify
+        This function is a convenience wrapper for ``exp.save_experiment`` to simplify
         boilerplate code.
 
     Example:
-        >>> persist_experiment(
+        ::
+
+            persist_experiment(
                 my_regression_exp, folder="saved_experiments", strategy="local"
             )
-        'saved_experiments/my_experiment_log.pkl'
+        ``'saved_experiments/my_experiment_log.pkl'``
     """
     if strategy == "local":
         exp_folder = Path(folder)
@@ -368,6 +344,47 @@ def persist_experiment(
         path_exp = f"{exp_folder}/{experiment.exp_name_log}.exp"
         experiment.save_experiment(path_or_file=path_exp)
         return path_exp
+
+    raise ValueError("unknown saving strategy")
+
+
+def persist_model(
+    experiment: RegressionExperiment,
+    model,
+    folder: str = "artifacts/models",
+    strategy: str = "local",
+):
+    """Persist the given model.
+
+    Parameters:
+        experiment (RegressionExperiment): The regression experiment object.
+
+        model: The trained model to be persisted.
+
+        folder (str, optional): The folder where the model will be saved.
+            Defaults to ``"models"``.
+
+        strategy (str, optional): The saving strategy.
+            Currently, only ``"local"`` strategy is supported. Defaults to ``"local"``.
+
+    Returns:
+        Path: The path where the model is saved.
+
+    Raises:
+        ValueError: If an unknown saving strategy is provided.
+
+    Note:
+        This function is a convenience wrapper around the ``save_model`` method
+        of the provided ``experiment`` object. It automatically manages the
+        boilerplate code for saving the model with the appropriate name derived
+        from the experiment.
+    """
+    if strategy == "local":
+        model_folder = Path(folder)
+        model_folder.mkdir(parents=True, exist_ok=True)
+        path_model = model_folder / Path(experiment.exp_name_log)
+        experiment.save_model(model=model, model_name=str(path_model))
+        return path_model
 
     raise ValueError("unknown saving strategy")
 

@@ -10,7 +10,7 @@ root: README
 parts:
   - caption: Examples
     chapters:
-      - file: test-functions.ipynb
+      - file: test-functions
   - caption: Documentation
     chapters:
       - file: api

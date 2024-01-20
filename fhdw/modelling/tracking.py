@@ -1,8 +1,4 @@
-"""Tracking Resources.
-
-Tracking could be implemented with MLflow for example. Functions that utilize tracking
-with MLflow will be named accordingly.
-"""
+"""Tracking Resources."""
 
 import mlflow
 
