@@ -49,7 +49,7 @@ Do not tinker with the generated configuration (`conf.py`). All configuration is
 Then run the autobuild with:
 
 ```sh
-sphinx-autobuild -a --open-browser docs docs/_build/html
+sphinx-autobuild -a --open-browser --watch fhdw/ docs/ docs/_build/html
 ```
 
 ## Contribution
