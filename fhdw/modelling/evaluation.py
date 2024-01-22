@@ -2,6 +2,7 @@
 
 import pandas as pd
 import plotly.express as px
+from pandas import Series
 from sklearn.metrics import mean_absolute_error
 from sklearn.metrics import mean_absolute_percentage_error
 from sklearn.metrics import mean_squared_error
@@ -48,5 +49,33 @@ def plot_estimates_model_vs_actual(y_true, y_pred, target: str):
         labels={"value": target},
         hover_name=result.index,
         marginal_y="box",
+    )
+    return figure
+
+
+def plot_actual_vs_pred(y_true: Series, y_pred: Series, target: str):
+    """Plot to compare the predicted output vs. the actual output.
+
+    Args:
+        y_true: The Ground Truth. Will be plotted on x-axis.
+
+        y_pred: The predicted values. Will be plotted on y-axis.
+
+        target: will be used for the plots title.
+    """
+    figure = px.scatter(
+        x=y_true,
+        y=y_pred,
+        labels={"x": "ground truth", "y": "prediction"},
+        title=target,
+        trendline="ols",
+    )
+    figure.add_shape(
+        type="line",
+        line={"dash": "dash"},
+        x0=y_true.min(),
+        y0=y_true.min(),
+        x1=y_true.max(),
+        y1=y_true.max(),
     )
     return figure
