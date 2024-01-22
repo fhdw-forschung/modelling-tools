@@ -1,6 +1,7 @@
 """Test evaluation resources."""
+import pandas as pd
 
-
+from fhdw.modelling.evaluation import plot_actual_vs_pred
 from fhdw.modelling.evaluation import plot_estimates_model_vs_actual
 
 
@@ -23,3 +24,19 @@ def test_plot_estimates_model_vs_actual():
     assert figure.data[0].y.tolist() == y_pred
     assert figure.data[2].y.tolist() == y_true
     assert len(figure.data) == 4
+
+
+def test_plot_actual_vs_pred():
+    """Test identity-plot properties after generating the plot."""
+    y_true = pd.Series([1, 2, 3, 4, 5])
+    y_pred = pd.Series([1.1, 2.2, 2.9, 4.2, 5.1])
+    target = "Test Plot"
+
+    figure = plot_actual_vs_pred(y_true, y_pred, target)
+
+    figure_dict = figure.to_dict()
+    assert figure_dict["layout"]["title"]["text"] == target
+    assert figure_dict["layout"]["xaxis"]["title"]["text"] == "ground truth"
+    assert figure_dict["layout"]["yaxis"]["title"]["text"] == "prediction"
+    assert len(figure_dict["layout"]["shapes"]) == 1
+    assert figure_dict["layout"]["shapes"][0]["type"] == "line"
