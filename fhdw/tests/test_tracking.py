@@ -20,15 +20,28 @@ def sample_data():
 def test_log_metrics_to_mlflow(fix_data):
     """Test case for log_metrics_to_mlflow function."""
     y_true, y_pred = fix_data
+    mock_log_metrics = MagicMock()
 
-    # Create a MagicMock for mlflow.log_metrics
+    # Patch mlflow.log_metrics with mock object
+    with patch("mlflow.log_metrics", mock_log_metrics):
+        log_metrics_to_mlflow(y_true, y_pred)
+        expected_metrics = get_regression_metrics(y_true=y_true, y_pred=y_pred)
+        mock_log_metrics.assert_called_once_with(metrics=expected_metrics)
+
+
+def test_log_metrics_to_mlflow_prefix(fix_data):
+    """Test case for log_metrics_to_mlflow function."""
+    y_true, y_pred = fix_data
     mock_log_metrics = MagicMock()
 
     # Patch mlflow.log_metrics with the mock object
     with patch("mlflow.log_metrics", mock_log_metrics):
-        # Call the function under test
-        log_metrics_to_mlflow(y_true, y_pred)
+        log_metrics_to_mlflow(y_true, y_pred, prefix="test")
+        without_separator = get_regression_metrics(y_true=y_true, y_pred=y_pred)
+        without_separator = {f"test_{k}": v for k, v in without_separator.items()}
+        mock_log_metrics.assert_called_with(metrics=without_separator)
 
-        # Assert that mlflow.log_metrics is called with the expected arguments
-        expected_metrics = get_regression_metrics(y_true=y_true, y_pred=y_pred)
-        mock_log_metrics.assert_called_once_with(metrics=expected_metrics)
+        log_metrics_to_mlflow(y_true, y_pred, prefix="sup_")
+        with_separator = get_regression_metrics(y_true=y_true, y_pred=y_pred)
+        with_separator = {f"sup_{k}": v for k, v in with_separator.items()}
+        mock_log_metrics.assert_called_with(metrics=with_separator)
