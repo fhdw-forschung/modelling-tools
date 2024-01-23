@@ -11,6 +11,7 @@ parts:
   - caption: Examples
     chapters:
       - file: test-functions
+      - file: mlflow-pycaret-management
   - caption: Documentation
     chapters:
       - file: api
