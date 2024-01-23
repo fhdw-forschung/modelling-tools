@@ -1,8 +1,8 @@
 """Test evaluation resources."""
 import pandas as pd
 
-from fhdw.modelling.evaluation import plot_actual_vs_pred
-from fhdw.modelling.evaluation import plot_estimates_model_vs_actual
+from fhdw.modelling.evaluation import plot_identity
+from fhdw.modelling.evaluation import plot_model_estimates
 
 
 def test_plot_estimates_model_vs_actual():
@@ -13,7 +13,7 @@ def test_plot_estimates_model_vs_actual():
     target_name = "Test Target"
 
     # Call the function to generate the plot
-    figure = plot_estimates_model_vs_actual(y_true, y_pred, target_name)
+    figure = plot_model_estimates(y_true, y_pred, target_name)
 
     assert figure.layout.title.text == target_name  # type: ignore
     assert figure.layout.xaxis.title.text == "index"  # type: ignore
@@ -32,7 +32,7 @@ def test_plot_actual_vs_pred():
     y_pred = pd.Series([1.1, 2.2, 2.9, 4.2, 5.1])
     target = "Test Plot"
 
-    figure = plot_actual_vs_pred(y_true, y_pred, target)
+    figure = plot_identity(y_true, y_pred, target)
 
     figure_dict = figure.to_dict()
     assert figure_dict["layout"]["title"]["text"] == target

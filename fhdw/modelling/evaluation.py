@@ -22,8 +22,8 @@ def get_regression_metrics(y_true, y_pred):
     return metrics
 
 
-def plot_estimates_model_vs_actual(y_true, y_pred, target: str):
-    """Plot to compare estimates.
+def plot_model_estimates(y_true, y_pred, target: str):
+    """Plot to compare model inference with actual values.
 
     Estimates made by the model with `experiment.predict_model` are plotted alongside
     with the actual values.
@@ -53,7 +53,7 @@ def plot_estimates_model_vs_actual(y_true, y_pred, target: str):
     return figure
 
 
-def plot_actual_vs_pred(y_true: Series, y_pred: Series, target: str):
+def plot_identity(y_true: Series, y_pred: Series, target: str):
     """Plot to compare the predicted output vs. the actual output.
 
     Args:
