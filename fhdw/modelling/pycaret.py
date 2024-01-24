@@ -209,7 +209,7 @@ def create_regression_model(
             verbose=verbose_pycaret,
         )
 
-    best_model = exp.automl(optimize=sort_metric)
+    best_model = exp.automl(optimize=sort_metric, turbo=False)
 
     if save_strategy == "local":
         # saving artifacts
@@ -336,7 +336,7 @@ def persist_experiment(
             persist_experiment(
                 my_regression_exp, folder="saved_experiments", strategy="local"
             )
-        ``'saved_experiments/my_experiment_log.pkl'``
+            ``'saved_experiments/my_experiment_log.pkl'``
     """
     if strategy == "local":
         exp_folder = Path(folder)
