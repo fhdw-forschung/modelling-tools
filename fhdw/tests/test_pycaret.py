@@ -1,6 +1,8 @@
 """Test cases for the pycaret modelling tools."""
 from pathlib import Path
 from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
 
 import pytest
 from pycaret.regression import RegressionExperiment
@@ -13,6 +15,7 @@ from sklearn.linear_model._coordinate_descent import ElasticNet
 from sklearn.linear_model._ridge import Ridge
 from sklearn.neighbors._regression import KNeighborsRegressor
 
+from fhdw.modelling.pycaret import PyCaretModelManagement
 from fhdw.modelling.pycaret import create_regression_model
 from fhdw.modelling.pycaret import get_model_paths
 from fhdw.modelling.pycaret import persist_data
@@ -45,6 +48,12 @@ def mock_regression_experiment():
     mock = MagicMock(spec=RegressionExperiment)
     mock.exp_name_log = "test_experiment"
     return mock
+
+
+@pytest.fixture(name="mock_pycaret_model_management")
+def pycaret_model_management():
+    """Create PycaretModelManagement Object."""
+    return PyCaretModelManagement(model_name="example_model")
 
 
 # Basic test case with minimum required inputs
@@ -317,3 +326,16 @@ def test_persist_experiment_unknown_strategy(mock_experiment):
     # Act & Assert
     with pytest.raises(ValueError, match="unknown saving strategy"):
         persist_experiment(experiment, folder, strategy)
+
+
+@patch("mlflow.pyfunc.load_model")
+def test_get_model_at_stage(mock_load_model, mock_pycaret_model_management):
+    """Test model retrieval procedure."""
+    # Mocking mlflow.pyfunc.load_model
+    mock_model = Mock()
+    mock_load_model.return_value = mock_model
+
+    model = mock_pycaret_model_management.get_model_at_stage(stage_name="TestStage")
+
+    mock_load_model.assert_called_once_with("models:/example_model/TestStage")
+    assert model == mock_model
