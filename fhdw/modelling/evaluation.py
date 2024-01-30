@@ -1,5 +1,7 @@
 """Collection of evaluation resources and methods."""
 
+import warnings
+
 import pandas as pd
 import plotly.express as px
 from pandas import Series
@@ -11,14 +13,30 @@ from sklearn.metrics import r2_score
 
 
 def get_regression_metrics(y_true, y_pred):
-    """Get dictionary of common regression metrics."""
+    """Get dictionary of common regression metrics.
+
+    Args:
+        y_true: The actual values of the ground truth.
+
+        y_pred: The inference values made by the model.
+    """
+    if (y_true < 0).any() or (y_pred < 0).any():
+        warnings.warn(
+            "Mean Squared Logarithmic Error cannot be used when "
+            "targets contain negative values. Therefore it is set to None here."
+        )
+        rmsle = None
+    else:
+        rmsle = mean_squared_log_error(y_true=y_true, y_pred=y_pred, squared=False)
+
     metrics = {
         "MAE": mean_absolute_error(y_true=y_true, y_pred=y_pred),
         "MAPE": mean_absolute_percentage_error(y_true=y_true, y_pred=y_pred),
         "RMSE": mean_squared_error(y_true=y_true, y_pred=y_pred, squared=False),
-        "RMSLE": mean_squared_log_error(y_true=y_true, y_pred=y_pred, squared=False),
+        "RMSLE": rmsle,
         "R2": r2_score(y_true=y_true, y_pred=y_pred),
     }
+
     return metrics
 
 

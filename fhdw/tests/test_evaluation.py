@@ -1,8 +1,47 @@
 """Test evaluation resources."""
 import pandas as pd
 
+from fhdw.modelling.evaluation import get_regression_metrics
 from fhdw.modelling.evaluation import plot_identity
 from fhdw.modelling.evaluation import plot_model_estimates
+
+
+def test_get_regression_metrics_positive():
+    """Test regression metrics calculation for positive values."""
+    y_true = pd.Series([1, 2, 3, 4, 5])
+    y_pred = pd.Series([1.1, 2.2, 2.9, 4.2, 5.1])
+
+    metrics = get_regression_metrics(y_true=y_true, y_pred=y_pred)
+
+    assert len(metrics) == 5
+    assert metrics["RMSLE"] is not None
+
+
+def test_get_regression_metrics_negative():
+    """Test regression metrics calculation with negative values."""
+    y_true = pd.Series([1, 2, 3, 4, 5])
+    y_pred = pd.Series([1.1, -2.2, 2.9, 4.2, 5.1])
+
+    metrics = get_regression_metrics(y_true=y_true, y_pred=y_pred)
+
+    assert len(metrics) == 5
+    assert metrics["RMSLE"] is None
+
+    y_true = pd.Series([1, 2, -3, 4, 5])
+    y_pred = pd.Series([1.1, 2.2, 2.9, 4.2, 5.1])
+
+    metrics = get_regression_metrics(y_true=y_true, y_pred=y_pred)
+
+    assert len(metrics) == 5
+    assert metrics["RMSLE"] is None
+
+    y_true = pd.Series([-1, 2, 3, 4, 5])
+    y_pred = pd.Series([1.1, -2.2, 2.9, 4.2, 5.1])
+
+    metrics = get_regression_metrics(y_true=y_true, y_pred=y_pred)
+
+    assert len(metrics) == 5
+    assert metrics["RMSLE"] is None
 
 
 def test_plot_estimates_model_vs_actual():
