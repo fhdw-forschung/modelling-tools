@@ -31,7 +31,7 @@ jb build --all --builder html docs
 ```
 
 ```{note}
-When using devcontainers for development (recommended), the generated files are not directly accessible from your systems browser and have to be provided via a web server example. With `vscode` you could also use the preview functionality of the `"ms-vscode.live-server"` extension (already installed if you use the provided devcontainer configuration of this repo). Alternatively you could utilize Sphinx's autobuild extension described below.
+When using devcontainers for development (recommended), the generated files are not directly accessible from your systems browser and have to be provided via a web server for example. With `vscode` you could also use the preview functionality of the `"ms-vscode.live-server"` extension (already installed if you use the provided devcontainer configuration of this repo). Alternatively you could utilize Sphinx's `autobuild` extension described below.
 ```
 
 Auto-generating the docs with a watchdog while developing can be done via the [`sphinx-autobuild` extension (click for details)](https://github.com/executablebooks/sphinx-autobuild). Before running `sphinx-autobuild`, convert the Jupyter Book configuration with the following command (from root of repo):

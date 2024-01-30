@@ -41,18 +41,28 @@ def get_regression_metrics(y_true, y_pred):
     return metrics
 
 
-def plot_model_estimates(y_true, y_pred, target: str):
-    """Plot to compare model inference with actual values.
+def plot_estimates(y_true: Series, y_pred: Series, title: str):
+    """Plot to compare model inference of a single with actual values.
 
-    Estimates made by the model with `experiment.predict_model` are plotted alongside
+    Estimates made by the model with ``experiment.predict_model`` are plotted alongside
     with the actual values.
 
     Args:
-        y_true: The actual values of the ground truth.
+        y_true (``pandas.Series``): The actual values of the ground truth.
 
-        y_pred: The inference values made by the model.
+        y_pred (``pandas.Series``): The inference values made by the model.
 
-        target (string): The learning target. Will be used for titles and labels.
+        title (``str``): The plot's title.
+
+    Returns:
+        A plotly ``Figure`` object. Use its ``show`` function to display it in e.g.
+        notebooks.
+
+    Note:
+        This function is related to ``plot_model_estimates_multiple_models``. The
+        difference is the slightly more convenient notation with explicit ``y_true``
+        and ``y_pred`` notation and thereby does demand to define a ``DataFrame``
+        in beforehand.
     """
     result = pd.DataFrame(
         {
@@ -64,15 +74,42 @@ def plot_model_estimates(y_true, y_pred, target: str):
         result,
         x=result.index,
         y=["Model", "y_true"],
-        title=target,
-        labels={"value": target},
+        title=title,
+        labels={"value": title},
         hover_name=result.index,
         marginal_y="box",
     )
     return figure
 
 
-def plot_identity(y_true: Series, y_pred: Series, target: str):
+def plot_estimates_multiple_models(data: pd.DataFrame, title: str):
+    """Plot to compare model inference with actual values.
+
+    Structure of the given DataFrame should be one column per model to be compared.
+    The index must be named and is used as the label (i.e. hover information).
+
+    Args:
+        data (``pandas.DataFrame``): The ``DataFrame`` with predictions.
+
+        title (``str``): The plot's title.
+
+    Returns:
+        A plotly ``Figure`` object. Use its ``show`` function to display it in e.g.
+        notebooks.
+    """
+    figure = px.scatter(
+        data.reset_index(),
+        x=data.index.name,
+        y=list(data.columns),
+        title=title,
+        hover_name=data.index.name,
+        hover_data={data.index.name: False},
+        marginal_y="box",
+    )
+    return figure
+
+
+def plot_identity(y_true: Series, y_pred: Series, title: str):
     """Plot to compare the predicted output vs. the actual output.
 
     Args:
@@ -80,13 +117,13 @@ def plot_identity(y_true: Series, y_pred: Series, target: str):
 
         y_pred: The predicted values. Will be plotted on y-axis.
 
-        target: will be used for the plots title.
+        title (``str``): The plot's title.
     """
     figure = px.scatter(
         x=y_true,
         y=y_pred,
         labels={"x": "ground truth", "y": "prediction"},
-        title=target,
+        title=title,
         trendline="ols",
     )
     figure.add_shape(
