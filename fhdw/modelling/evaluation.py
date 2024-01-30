@@ -20,14 +20,15 @@ def get_regression_metrics(y_true, y_pred):
 
         y_pred: The inference values made by the model.
     """
-    if (y_true < 0).any() or (y_pred < 0).any():
+    try:
+        rmsle = mean_squared_log_error(y_true=y_true, y_pred=y_pred, squared=False)
+    except ValueError:
+        rmsle = None
+
         warnings.warn(
             "Mean Squared Logarithmic Error cannot be used when "
             "targets contain negative values. Therefore it is set to None here."
         )
-        rmsle = None
-    else:
-        rmsle = mean_squared_log_error(y_true=y_true, y_pred=y_pred, squared=False)
 
     metrics = {
         "MAE": mean_absolute_error(y_true=y_true, y_pred=y_pred),
