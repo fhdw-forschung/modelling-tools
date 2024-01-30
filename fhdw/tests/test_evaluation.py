@@ -5,6 +5,7 @@ from fhdw.modelling.evaluation import get_regression_metrics
 from fhdw.modelling.evaluation import plot_estimates
 from fhdw.modelling.evaluation import plot_estimates_multiple_models
 from fhdw.modelling.evaluation import plot_identity
+from fhdw.modelling.evaluation import plot_identity_multiple_models
 
 
 def test_get_regression_metrics_positive():
@@ -99,3 +100,21 @@ def test_plot_identity_single_model_variant():
     assert figure_dict["layout"]["yaxis"]["title"]["text"] == "prediction"
     assert len(figure_dict["layout"]["shapes"]) == 1
     assert figure_dict["layout"]["shapes"][0]["type"] == "line"
+
+
+def test_plot_identity_multiple_models_variant():
+    """Test estimate plot in the multiple model variant."""
+    # Mock data for testing
+    y_true = pd.Series([1, 2, 3, 4, 5])
+    model1 = pd.Series([1.1, 2.2, 2.8, 3.7, 4.9])
+    model2 = pd.Series([1, 3, 4, 2.0, 6])
+    title = "Test Target"
+
+    data = pd.DataFrame({"y_true": y_true, "model1": model1, "model2": model2})
+
+    # generate the plot
+    figure = plot_identity_multiple_models(data, title)
+
+    figure_dict = figure.to_dict()
+    assert figure_dict["layout"]["title"]["text"] == title
+    assert len(figure.data) == 4  # type: ignore

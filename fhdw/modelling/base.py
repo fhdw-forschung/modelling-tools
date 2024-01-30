@@ -10,10 +10,10 @@ def clean_string(string: str):
     Those inbetween are replaced with a hyphen ``-`` character.
 
     Args:
-        string (str): The input string to be cleaned.
+        string (``str``): The input string to be cleaned.
 
     Returns:
-        str: The cleaned string with special characters removed and converted to
+        ``str``: The cleaned string with special characters removed and converted to
         lowercase.
     """
     cleaned = re.sub(r"^\W+|\W+$", "", string)
@@ -28,14 +28,15 @@ def make_experiment_name(target: str, prefix: str = "", sep: str = "-"):
     lowercase using the ``clean_string`` function.
 
     Args:
-        target (str): The target variable for the experiment.
+        target (``str``): The target variable for the experiment.
 
-        prefix (str, optional): An optional prefix to be added to the experiment name.
+        prefix (``str``, optional): An optional prefix to be added to the experiment
+            name.
 
-        sep (str, optional): An optional seperator, placed between prefix and name.
+        sep (``str``, optional): An optional seperator, placed between prefix and name.
 
     Returns:
-        str: A formatted experiment name in the pattern
+        ``str``: A formatted experiment name in the pattern
         ``[{prefix}{sep}]{cleaned_target}``.
     """
     clean_target_name = clean_string(target)

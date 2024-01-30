@@ -171,7 +171,7 @@ def create_regression_model(
             See scikit-learn documentation for details.
 
     Returns:
-        tuple: The ``RegressionExperiment`` and the tuned Pipeline containing the model.
+        ``tuple``: The ``RegressionExperiment`` and the best trained model model.
     """
     min_sel = 1  # at least select one method
     verb_levels = [0, 1, 2]
@@ -289,25 +289,25 @@ def get_model_paths(folder: str = "artifacts/models", stategy: str = "local"):
     Recursive ``Path.glob``.
 
     Args:
-        folder (str, optional): Path to the folder containing model files. Defaults
+        folder (``str``, optional): Path to the folder containing model files. Defaults
             to ``"models"``. Folder will be created if not existing.
 
         file_extension (str, optional): File extension for model files. Defaults to
             ``"pkl"``.
 
-        strategy (str, optional): Retrieval strategy. Currently, only ``"local"``
+        strategy (``str``, optional): Retrieval strategy. Currently, only ``"local"``
             strategy is supported. Other strategies like MLflow might be supported in
             the future.
 
     Returns:
-        List[Path]: A list of ``Path`` objects representing the model files in the
+        ``List[Path]``: A list of ``Path`` objects representing the model files in the
         specified folder.
 
     Raises:
-        NotADirectoryError: If the specified folder does not exist or is not a
+        ``NotADirectoryError``: If the specified folder does not exist or is not a
             directory.
 
-        ValueError: If an unsupported retrieval strategy is specified.
+        ``ValueError``: If an unsupported retrieval strategy is specified.
     """
     if not Path(folder).is_dir():
         raise NotADirectoryError(f"'{folder}' either not existing or not a folder.")
@@ -326,19 +326,19 @@ def persist_data(
     """Persists the dataset from a ``RegressionExperiment``.
 
     Args:
-        experiment (RegressionExperiment): The experiment containing the dataset.
+        experiment (``RegressionExperiment``): The experiment containing the dataset.
 
-        folder (str, optional): The folder path to save the dataset. Defaults to
+        folder (``str``, optional): The folder path to save the dataset. Defaults to
             ``"experiments/data"``. Folder will be created if not existing.
 
-        strategy (str, optional): The strategy for saving the dataset. Defaults to
+        strategy (``str``, optional): The strategy for saving the dataset. Defaults to
             ``"local"``.
 
     Returns:
-        str: The path where the dataset is saved.
+        ``str``: The path where the dataset is saved.
 
     Raises:
-        ValueError: Raised when an unknown saving strategy is provided.
+        ``ValueError``: Raised when an unknown saving strategy is provided.
 
     Example:
         ::
@@ -369,19 +369,19 @@ def persist_experiment(
     You could use ``persist_data`` for this.
 
     Args:
-        experiment (RegressionExperiment): The experiment to be persisted.
+        experiment (``RegressionExperiment``): The experiment to be persisted.
 
-        folder (str, optional): The folder path where the experiment will be saved.
+        folder (``str``, optional): The folder path where the experiment will be saved.
             Defaults to ``"experiments"``.
 
-        strategy (str, optional): The saving strategy. Currently, only ``"local"``
+        strategy (``str``, optional): The saving strategy. Currently, only ``"local"``
             strategy is supported. Defaults to ``"local"``.
 
     Returns:
-        str: The path where the experiment is saved.
+        ``str``: The path where the experiment is saved.
 
     Raises:
-        ValueError: Raised when an unknown saving strategy is provided.
+        ``ValueError``: Raised when an unknown saving strategy is provided.
 
     Note:
         This function is a convenience wrapper for ``exp.save_experiment`` to simplify
@@ -414,21 +414,21 @@ def persist_model(
     """Persist the given model.
 
     Args:
-        experiment (RegressionExperiment): The regression experiment object.
+        experiment (``RegressionExperiment``): The regression experiment object.
 
         model: The trained model to be persisted.
 
-        folder (str, optional): The folder where the model will be saved.
+        folder (``str``, optional): The folder where the model will be saved.
             Defaults to ``"models"``.
 
-        strategy (str, optional): The saving strategy.
+        strategy (``str``, optional): The saving strategy.
             Currently, only ``"local"`` strategy is supported. Defaults to ``"local"``.
 
     Returns:
-        Path: The path where the model is saved.
+        ``pathlib.Path``: The path where the model is saved.
 
     Raises:
-        ValueError: If an unknown saving strategy is provided.
+        ``ValueError``: If an unknown saving strategy is provided.
 
     Note:
         This function is a convenience wrapper around the ``save_model`` method

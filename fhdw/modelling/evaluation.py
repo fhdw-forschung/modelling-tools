@@ -12,13 +12,13 @@ from sklearn.metrics import mean_squared_log_error
 from sklearn.metrics import r2_score
 
 
-def get_regression_metrics(y_true, y_pred):
+def get_regression_metrics(y_true: Series, y_pred: Series):
     """Get dictionary of common regression metrics.
 
     Args:
-        y_true: The actual values of the ground truth.
+        y_true (``pandas.Series``): The actual values of the ground truth.
 
-        y_pred: The inference values made by the model.
+        y_pred (``pandas.Series``): The inference values made by the model.
     """
     try:
         rmsle = mean_squared_log_error(y_true=y_true, y_pred=y_pred, squared=False)
@@ -113,11 +113,21 @@ def plot_identity(y_true: Series, y_pred: Series, title: str):
     """Plot to compare the predicted output vs. the actual output.
 
     Args:
-        y_true: The Ground Truth. Will be plotted on x-axis.
+        y_true (``pandas.Series``): The Ground Truth. Will be plotted on x-axis.
 
-        y_pred: The predicted values. Will be plotted on y-axis.
+        y_pred (``pandas.Series``): The predicted values. Will be plotted on y-axis.
 
         title (``str``): The plot's title.
+
+    Returns:
+        A plotly ``Figure`` object. Use its ``show`` function to display it in e.g.
+        notebooks.
+
+    Note:
+        This function is related to ``plot_identity_multiple_models``. The
+        difference is the slightly more convenient notation with explicit ``y_true``
+        and ``y_pred`` notation and thereby does demand to define a ``DataFrame``
+        in beforehand.
     """
     figure = px.scatter(
         x=y_true,
@@ -126,6 +136,38 @@ def plot_identity(y_true: Series, y_pred: Series, title: str):
         title=title,
         trendline="ols",
     )
+    figure.add_shape(
+        type="line",
+        line={"dash": "dash"},
+        x0=y_true.min(),
+        y0=y_true.min(),
+        x1=y_true.max(),
+        y1=y_true.max(),
+    )
+    return figure
+
+
+def plot_identity_multiple_models(data: pd.DataFrame, title: str):
+    """Plot to compare the predicted output vs. the actual output.
+
+    The ``data``'s structure must include a column named ``y_true``.
+    The index must be a named index (is transformed into a ``pandas.Series``).
+    All other columns are used as predictions (i.e. models to be compared).
+
+    Args:
+        data (``pandas.DataFrame``): The ``DataFrame`` with predictions.
+
+        title (``str``): The plot's title.
+    """
+    figure = px.scatter(
+        data.reset_index(),
+        x="y_true",
+        y=list(data.columns),
+        trendline="ols",
+        title=title,
+        hover_name=data.index.name,
+    )
+    y_true = data["y_true"]
     figure.add_shape(
         type="line",
         line={"dash": "dash"},
