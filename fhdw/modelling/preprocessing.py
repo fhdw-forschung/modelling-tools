@@ -13,7 +13,7 @@ def remove_outliers_isolation(
     random_state=None,
     verbose: bool = True,
 ) -> DataFrame:
-    """Remove outliers with the IsolationForest algorithm.
+    """Remove outliers with the ``IsolationForest`` algorithm.
 
     It is possible to pass a complete data set with independent (X) incl.
     dependent (y) variables
@@ -23,7 +23,7 @@ def remove_outliers_isolation(
 
         imputer_strategy: The Imputer strategy to be used.
 
-        random_state: The random state to be used for the IsolationForest algorithm.
+        random_state: The random state to be used for the ``IsolationForest`` algorithm.
 
     Returns:
         The dataset reduced by the found outliers.
@@ -48,31 +48,34 @@ def apply_isolation_forest(
     random_state=None,
     verbose: bool = True,
 ):
-    """Detect outliers with the IsolationForest algorithm.
+    """Detect outliers with the ``IsolationForest`` algorithm.
 
     It is possible to pass a complete data set with independent (X) incl.
     dependent (y) variables
 
-    For the application of the `IsolationForest` algorithm it is necessary that there
-    are no NaNs in the data. Therefore an imputer is used. Here it uses 'median' as the
-    default strategy instead of simply replacing the NaNs with zeros ('0'), because
-    there may be cases where there are only a few values in a column.
+    For the application of the ``IsolationForest`` algorithm it is necessary that there
+    are no ``NaN`` values in the data. Therefore an imputer is used. Here it uses
+    ``median`` as the default strategy instead of simply replacing the ``NaN`` values
+    with zeros ('0'), because there may be cases where there are only a few values in a
+    column.
     In such a case, the zeros would form a data imbalance after replacement and would
-    potentially be interpreted as 'normality' by the IsolationForest method. Therefore,
-    it makes sense to replace with a customized strategy. Mean or median are suitable.
-
-    Note: A `sklearn.impute.SimpleImputer` imputer is used. Read the respecting
-    documentation on more detail about available strategies.
+    potentially be interpreted as 'normality' by the ``IsolationForest`` method.
+    Therefore, it makes sense to replace with a customized strategy. Mean or median are
+    suitable.
 
     Args:
         data: The DataFrame to be reduced.
 
         imputer_strategy: The Imputer strategy to be used.
 
-        random_state: The random state to be used for the IsolationForest algorithm.
+        random_state: The random state to be used for the ``IsolationForest`` algorithm.
 
     Returns:
         The indices found to be anomal and therefore marked as outliers.
+
+    Note:
+        A ``sklearn.impute.SimpleImputer`` imputer is used. Read the respecting
+        documentation on more detail about available strategies.
     """
     if verbose:
         print("Detect Outliers...")
