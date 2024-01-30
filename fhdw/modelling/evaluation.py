@@ -135,3 +135,35 @@ def plot_identity(y_true: Series, y_pred: Series, title: str):
         y1=y_true.max(),
     )
     return figure
+
+
+def plot_identity_multiple_models(data: pd.DataFrame, title: str):
+    """Plot to compare the predicted output vs. the actual output.
+
+    The ``data``'s structure must include a column named ``y_true``.
+    The index must be a named index (is transformed into a ``pandas.Series``).
+    All other columns are used as predictions (i.e. models to be compared).
+
+    Args:
+        data (``pandas.DataFrame``): The ``DataFrame`` with predictions.
+
+        title (``str``): The plot's title.
+    """
+    figure = px.scatter(
+        data.reset_index(),
+        x="y_true",
+        y=list(data.columns),
+        trendline="ols",
+        title=title,
+        hover_name=data.index.name,
+    )
+    y_true = data["y_true"]
+    figure.add_shape(
+        type="line",
+        line={"dash": "dash"},
+        x0=y_true.min(),
+        y0=y_true.min(),
+        x1=y_true.max(),
+        y1=y_true.max(),
+    )
+    return figure
