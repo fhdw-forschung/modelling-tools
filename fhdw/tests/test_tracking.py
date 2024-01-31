@@ -3,6 +3,7 @@
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
+import pandas as pd
 import pytest
 
 from fhdw.modelling.evaluation import get_regression_metrics
@@ -26,6 +27,25 @@ def test_log_metrics_to_mlflow(fix_data):
     with patch("mlflow.log_metrics", mock_log_metrics):
         log_metrics_to_mlflow(y_true, y_pred)
         expected_metrics = get_regression_metrics(y_true=y_true, y_pred=y_pred)
+        mock_log_metrics.assert_called_once_with(metrics=expected_metrics)
+
+
+def test_log_metrics_to_mlflow_negative_value_in_prediction():
+    """Test case for log_metrics_to_mlflow function.
+
+    This test is to ensure that the mlflow log function is not called with a None value.
+    A None value is included when one of the predictions is negative, which results in
+    the fact, that the RMSLE cannot be calculated.
+    """
+    y_true = pd.Series([1.0, 2.0, 3.0, 4.0])
+    y_pred = pd.Series([1.0, -2.0, 3.0, 4.0])
+    mock_log_metrics = MagicMock()
+
+    # Patch mlflow.log_metrics with mock object
+    with patch("mlflow.log_metrics", mock_log_metrics):
+        log_metrics_to_mlflow(y_true, y_pred)
+        expected_metrics = get_regression_metrics(y_true=y_true, y_pred=y_pred)
+        expected_metrics.pop("RMSLE")
         mock_log_metrics.assert_called_once_with(metrics=expected_metrics)
 
 
