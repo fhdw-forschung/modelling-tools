@@ -1,67 +1,10 @@
 """Modelling process resources utilizing pycaret."""
 from pathlib import Path
 
-import mlflow
-import pandas as pd
 from pandas import DataFrame
 from pycaret.regression import RegressionExperiment
 
 from fhdw.modelling.base import make_experiment_name
-
-
-class PyCaretModelManagement:
-    """Pycaret Registered Model Management Unit."""
-
-    def __init__(self, model_name: str) -> None:
-        """Initialize PyCaret Model management.
-
-        Args:
-            model_name (str): The name of the registered model.
-        """
-        self.name = model_name
-        self.client = mlflow.tracking.MlflowClient()
-
-    def _get_parent_run_id(self, stage_name: str):
-        model = self._get_model_info_at_stage(stage_name=stage_name)
-        run = self.client.get_run(str(model.run_id))
-        parent_id = run.data.tags["mlflow.parentRunId"]
-        return parent_id
-
-    def _get_data_artifact(self, dataset: str, stage_name: str):
-        parent_id = self._get_parent_run_id(stage_name=stage_name)
-        data = self.client.download_artifacts(run_id=parent_id, path=f"{dataset}.csv")
-        return data
-
-    def _get_model_info_at_stage(self, stage_name: str = "Production"):
-        """Get the trained model of the registered model from the given stage."""
-        model = self.client.get_latest_versions(name=self.name, stages=[stage_name])
-
-        if len(model) != 1:
-            raise ValueError(
-                "Retrieved to many search results for versions "
-                f"of registered model '{self.name}'; "
-                f"expected 1, got {len(model)}"
-            )
-        return model[0]
-
-    def get_train_data(self, stage_name: str = "Production"):
-        """Return the data the named registered model has been trained with."""
-        data = self._get_data_artifact(dataset="Train", stage_name=stage_name)
-        data = pd.read_csv(data)
-        return data
-
-    def get_test_data(self, stage_name: str = "Production"):
-        """Return the holdout set used during training of the registered model."""
-        data = self._get_data_artifact(dataset="Test", stage_name=stage_name)
-        data = pd.read_csv(data)
-        return data
-
-    def get_model_at_stage(self, stage_name: str = "Production"):
-        """Get the trained model of the registered model from the given stage."""
-        reg_path = f"models:/{self.name}/{stage_name}"
-        model = mlflow.pyfunc.load_model(reg_path)
-        return model
-
 
 PLOTS = {
     "pipeline": "Schematic drawing of the preprocessing pipeline",

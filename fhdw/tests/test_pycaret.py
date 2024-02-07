@@ -15,11 +15,11 @@ from sklearn.linear_model._coordinate_descent import ElasticNet
 from sklearn.linear_model._ridge import Ridge
 from sklearn.neighbors._regression import KNeighborsRegressor
 
-from fhdw.modelling.pycaret import PyCaretModelManagement
 from fhdw.modelling.pycaret import create_regression_model
 from fhdw.modelling.pycaret import get_model_paths
 from fhdw.modelling.pycaret import persist_data
 from fhdw.modelling.pycaret import persist_experiment
+from fhdw.modelling.tracking import ModelManagement
 
 RANDOMIZED_SEARCH_ITERATIONS = 2
 
@@ -53,7 +53,7 @@ def mock_regression_experiment():
 @pytest.fixture(name="mock_pycaret_model_management")
 def pycaret_model_management():
     """Create PycaretModelManagement Object."""
-    return PyCaretModelManagement(model_name="example_model")
+    return ModelManagement(model_name="example_model")
 
 
 # Basic test case with minimum required inputs
