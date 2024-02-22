@@ -133,8 +133,9 @@ def plot_identity(y_true: Series, y_pred: Series, title: str):
         x=y_true,
         y=y_pred,
         labels={"x": "ground truth", "y": "prediction"},
-        title=title,
         trendline="ols",
+        title=title,
+        hover_name=y_true.index,
     )
     figure.add_shape(
         type="line",
