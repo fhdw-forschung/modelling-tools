@@ -143,6 +143,7 @@ def create_regression_model(
             data=data,
             target=target,
             experiment_name=exp_name,
+            experiment_custom_tags={"framework": "pycaret"},
             verbose=verbose_pycaret,
             log_experiment=log_experiment,
             log_data=log_experiment,
