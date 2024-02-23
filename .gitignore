@@ -166,6 +166,8 @@ experiments/*
 artifacts/*
 mlruns/*
 catboost_info/*
+dev_*.py
+dev_*.ipynb
 
 # vscode
 .vscode/settings.json
