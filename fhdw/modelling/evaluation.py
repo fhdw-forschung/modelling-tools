@@ -11,6 +11,9 @@ from sklearn.metrics import mean_squared_error
 from sklearn.metrics import mean_squared_log_error
 from sklearn.metrics import r2_score
 
+PASTEL_ORANGE = "#fa9f55"  # Pastel orange color
+PASTEL_BLUE = "#96ceff"  # Pastel blue color
+
 
 def get_regression_metrics(y_true: Series, y_pred: Series):
     """Get dictionary of common regression metrics.
@@ -178,3 +181,26 @@ def plot_identity_multiple_models(data: pd.DataFrame, title: str):
         y1=y_true.max(),
     )
     return figure
+
+
+def plot_train_test_target_distribution(target: str, y_train: Series, y_test: Series):
+    """Compare the train test distribution of the target variable with a plot.
+
+    Args:
+        target (``str``): Name of the learning target. Is used for the plot's title.
+
+        y_train (``pandas.Series``): The target column of the train set.
+
+        y_test (``pandas.Series``): The target column of the test set.
+    """
+    title = f"Train vs. Test Distribution for target '{target}'."
+    data = pd.concat([y_test, y_train], axis=1, keys=["test", "train"])
+    fig = px.histogram(
+        data,
+        marginal="box",
+        opacity=0.5,
+        nbins=int(len(y_train) * 0.25),
+        title=title,
+        color_discrete_sequence=[PASTEL_ORANGE, PASTEL_BLUE],
+    )
+    return fig
