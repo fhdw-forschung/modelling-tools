@@ -1,4 +1,5 @@
 """Test evaluation resources."""
+
 import pandas as pd
 
 from fhdw.modelling.evaluation import get_regression_metrics
@@ -6,6 +7,7 @@ from fhdw.modelling.evaluation import plot_estimates
 from fhdw.modelling.evaluation import plot_estimates_multiple_models
 from fhdw.modelling.evaluation import plot_identity
 from fhdw.modelling.evaluation import plot_identity_multiple_models
+from fhdw.modelling.evaluation import plot_train_test_target_distribution
 
 
 def test_get_regression_metrics_positive():
@@ -118,3 +120,18 @@ def test_plot_identity_multiple_models_variant():
     figure_dict = figure.to_dict()
     assert figure_dict["layout"]["title"]["text"] == title
     assert len(figure.data) == 4  # type: ignore
+
+
+# Test with sample data
+def test_plot_with_sample_data():
+    """Test distribution plot."""
+    y_train = pd.Series([1, 2, 2, 3])
+    y_test = pd.Series([2, 3, 4])
+    target = "example_target"
+
+    fig = plot_train_test_target_distribution(target, y_train, y_test)
+
+    # Assert expected plot properties
+    expected_title = "Train vs. Test Distribution for target 'example_target'."
+    assert fig.layout.title.text == expected_title
+    assert len(fig.data) == 4  # Data for train and test per trace (dist + box = 4)
