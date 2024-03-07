@@ -7,6 +7,7 @@ from fhdw.modelling.evaluation import plot_estimates
 from fhdw.modelling.evaluation import plot_estimates_multiple_models
 from fhdw.modelling.evaluation import plot_identity
 from fhdw.modelling.evaluation import plot_identity_multiple_models
+from fhdw.modelling.evaluation import plot_residuals
 from fhdw.modelling.evaluation import plot_train_test_target_distribution
 
 
@@ -124,7 +125,7 @@ def test_plot_identity_multiple_models_variant():
 
 # Test with sample data
 def test_plot_with_sample_data():
-    """Test distribution plot."""
+    """Test basic functionality distribution plot."""
     y_train = pd.Series([1, 2, 2, 3])
     y_test = pd.Series([2, 3, 4])
     target = "example_target"
@@ -134,4 +135,18 @@ def test_plot_with_sample_data():
     # Assert expected plot properties
     expected_title = "Train vs. Test Distribution for target 'example_target'."
     assert fig.layout.title.text == expected_title
-    assert len(fig.data) == 4  # Data for train and test per trace (dist + box = 4)
+
+    # Data for train and test per trace (dist + box = 4)
+    assert len(fig.data) == 4  # type: ignore
+
+
+def test_plot_residuals_basic():
+    """Test basic functionality of residual plot."""
+    y_train = pd.Series([1, 2, 3])
+    pred_train = pd.Series([4, 5, 6])
+    y_test = pd.Series([7, 8, 9])
+    pred_test = pd.Series([10, 11, 12])
+    title = "Residual Plot"
+    fig = plot_residuals(y_train, pred_train, y_test, pred_test, title)
+    assert fig.layout.title.text == title
+    assert len(fig.data) == 6  # type: ignore
