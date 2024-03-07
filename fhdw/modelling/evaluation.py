@@ -204,3 +204,43 @@ def plot_train_test_target_distribution(target: str, y_train: Series, y_test: Se
         color_discrete_sequence=[PASTEL_ORANGE, PASTEL_BLUE],
     )
     return fig
+
+
+def plot_residuals(y_train, pred_train, y_test, pred_test, title):
+    """Plot residuals of predictions.
+
+    Args:
+        y_train (``pandas.Series``): The target column of the training set.
+
+        pred_train (``pandas.Series``): The prediction of the model on the training set.
+
+        y_test (``pandas.Series``): The target column of the test set.
+
+        pred_test (``pandas.Series``): The prediction of the model on the test set.
+
+        title (``str``): The plot's title.
+    """
+    result = pd.concat(
+        [
+            pd.DataFrame(
+                {
+                    "Prediction": pred_train,
+                    "Residual": pred_train - y_train,
+                    "Set": "Train",
+                }
+            ),
+            pd.DataFrame(
+                {"Prediction": pred_test, "Residual": pred_test - y_test, "Set": "Test"}
+            ),
+        ]
+    )
+    figure = px.scatter(
+        result,
+        x="Prediction",
+        y="Residual",
+        marginal_y="box",
+        color="Set",
+        trendline="ols",
+        title=title,
+    )
+    return figure
