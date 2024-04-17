@@ -7,9 +7,9 @@ import plotly.express as px
 from pandas import Series
 from sklearn.metrics import mean_absolute_error
 from sklearn.metrics import mean_absolute_percentage_error
-from sklearn.metrics import mean_squared_error
-from sklearn.metrics import mean_squared_log_error
 from sklearn.metrics import r2_score
+from sklearn.metrics import root_mean_squared_error
+from sklearn.metrics import root_mean_squared_log_error
 
 PASTEL_ORANGE = "#fa9f55"  # Pastel orange color
 PASTEL_BLUE = "#96ceff"  # Pastel blue color
@@ -24,7 +24,7 @@ def get_regression_metrics(y_true: Series, y_pred: Series):
         y_pred (``pandas.Series``): The inference values made by the model.
     """
     try:
-        rmsle = mean_squared_log_error(y_true=y_true, y_pred=y_pred, squared=False)
+        rmsle = root_mean_squared_log_error(y_true=y_true, y_pred=y_pred)
     except ValueError:
         rmsle = None
 
@@ -36,7 +36,7 @@ def get_regression_metrics(y_true: Series, y_pred: Series):
     metrics = {
         "MAE": mean_absolute_error(y_true=y_true, y_pred=y_pred),
         "MAPE": mean_absolute_percentage_error(y_true=y_true, y_pred=y_pred),
-        "RMSE": mean_squared_error(y_true=y_true, y_pred=y_pred, squared=False),
+        "RMSE": root_mean_squared_error(y_true=y_true, y_pred=y_pred),
         "RMSLE": rmsle,
         "R2": r2_score(y_true=y_true, y_pred=y_pred),
     }
