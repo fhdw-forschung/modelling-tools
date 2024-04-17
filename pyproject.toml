@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "fhdw-modelling"
-version = "7.2.0"
+version = "7.2.1"
 description = "A collection of modelling tools. Intended for generic usage in FHDW projects."
 authors = ["Pascal Niggemeier <pascal.niggemeier@fhdw.de>"]
 license = "MPL-2.0"
@@ -22,7 +22,7 @@ python = ">=3.11,<3.12"
 fastapi = "^0.104.1"
 kaleido = "0.2.1"
 mlflow = "^2.10.2"
-pyarrow = "^14.0.1"
+pyarrow = "^15.0.2"
 pycaret = { version = "^3.3.0", extras = ["mlops", "models"] }
 pyyaml = "^6.0.1"
 
