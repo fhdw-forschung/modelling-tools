@@ -33,7 +33,8 @@ def make_experiment_name(target: str, prefix: str = "", sep: str = "-"):
         prefix (``str``, optional): An optional prefix to be added to the experiment
             name.
 
-        sep (``str``, optional): An optional seperator, placed between prefix and name.
+        sep (``str``, optional): An optional seperator, placed between ``prefix`` and
+            ``target``.
 
     Returns:
         ``str``: A formatted experiment name in the pattern
