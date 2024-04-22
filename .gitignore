@@ -171,6 +171,7 @@ dev_*.ipynb
 
 # vscode
 .vscode/settings.json
+.vscode/extensions.json
 devcontainer.env
 
 # conf.py should be converted from Jupyter Book
