@@ -240,7 +240,9 @@ def plot_residuals(y_train, pred_train, y_test, pred_test, title):
         y="Residual",
         marginal_y="box",
         color="Set",
+        opacity=0.7,
         trendline="ols",
         title=title,
     )
+    figure.add_hline(y=0, opacity=0.5, line={"dash": "dash"})
     return figure
