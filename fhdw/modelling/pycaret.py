@@ -130,6 +130,10 @@ def create_regression_model(
 
     verbose_pycaret = verbose == 2  # pycaret expects boolean; highest verbosity
 
+    # set common / fixed experiment information
+    experiment_custom_tags = kwargs.pop("experiment_custom_tags", {})
+    experiment_custom_tags.update({"framework": "pycaret"})
+
     if isinstance(experiment, RegressionExperiment) and data is None and target is None:
         exp = experiment
     elif experiment is None and isinstance(target, str) and isinstance(data, DataFrame):
@@ -143,7 +147,7 @@ def create_regression_model(
             data=data,
             target=target,
             experiment_name=exp_name,
-            experiment_custom_tags={"framework": "pycaret"},
+            experiment_custom_tags=experiment_custom_tags,
             verbose=verbose_pycaret,
             log_experiment=log_experiment,
             log_data=log_experiment,
