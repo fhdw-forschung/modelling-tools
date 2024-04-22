@@ -243,6 +243,7 @@ def plot_residuals(y_train, pred_train, y_test, pred_test, title):
         opacity=0.7,
         trendline="ols",
         title=title,
+        hover_name=result.index,
     )
     figure.add_hline(y=0, opacity=0.5, line={"dash": "dash"})
     return figure
